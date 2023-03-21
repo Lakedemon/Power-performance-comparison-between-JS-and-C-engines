@@ -9,16 +9,11 @@
 #include <iostream>
 
 class Shader {
-    unsigned int ID;
-
-    Shader(const char* vsPath, const char* fsPath);
-
 public:
-    unsigned int getId() const {
-        return ID;
-    }
-
+    Shader(const char* vsPath, const char* fsPath);
+    [[nodiscard]] unsigned int getId() const;
 private:
+    unsigned int ID;
     static std::string loadShaderFile(const char * path);
     void initShader(const char* shaderCode, GLenum shaderType) const;
     static void checkCompile(unsigned int shader);

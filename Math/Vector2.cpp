@@ -1,206 +1,65 @@
-/*
-import {glMath} from "./glMath.js";
+#include "Vector2.h"
 
-*/
-/** Class that represents a 2D vector*//*
+Vector2::Vector2(float x, float y) {
+    this->x = x;
+    this->y = y;
+}
 
-class Vector2 {
+float Vector2::magnitude() const {
+    return std::sqrt(x * x + y * y);
+}
 
-    */
-/**
-     * Create a Vector2
-     * @param {number} x - Value of x
-     * @param {number} y - Value of y
-     *//*
-
-    constructor(x, y) {
-        this.x = x;
-        this.y = y;
+Vector2 Vector2::normalized() const {
+    float length = magnitude();
+    if (length < glMath::EPSILON){
+        return zero;
     }
 
-    */
-/**
-     * Returns magnitude of this instance of Vector2
-     * @returns {number} magnitude
-     *//*
+    float lengthInv = 1 / length;
+    return {x * lengthInv, y * lengthInv};
+}
 
-    get magnitude() {
-        return Math.sqrt(this.x * this.x + this.y * this.y);
-    }
+Vector2 Vector2::one = {1, 1};
+Vector2 Vector2::zero = {0, 0};
+Vector2 Vector2::up = {0, 1};
+Vector2 Vector2::down = {0, -1};
+Vector2 Vector2::left = {-1, 0};
+Vector2 Vector2::right = {1, 0};
 
-    */
-/**
-     * Returns a unit vector of this instance of Vector2
-     * @returns {Vector2} unit vector
-     *//*
+int Vector2::side(Vector2 depended, Vector2 control, Vector2 normal) {
+    return std::signbit(dot(depended - control, normal));
+}
 
-    get normalized() {
-        const length = this.magnitude;
-        if (length < glMath.EPSILON) {
-            return Vector2.zero;
-        }
+float Vector2::distance(Vector2 a, Vector2 b) {
+    return (a - b).magnitude();
+}
 
-        const lengthInv = 1 / length;
-        return new Vector2(this.x * lengthInv, this.y * lengthInv);
-    }
+float Vector2::angle(Vector2 a, Vector2 b) {
+    float mag = (a.magnitude() * b.magnitude());
+    if(mag < glMath::EPSILON){return 0;}
+    return std::acos(dot(a, b) / mag);
+}
 
-    static one() {
-        return new Vector2(1, 1);
-    }
+float Vector2::dot(Vector2 a, Vector2 b) {
+    return a.x * b.x + a.y * b.y;
+}
 
-    static zero() {
-        return new Vector2(0, 0);
-    }
+float Vector2::cross(Vector2 a, Vector2 b) {
+    return a.x * b.y - a.y * b.y;
+}
+Vector2 Vector2::operator+(const Vector2 &b) const {
+    return {x + b.x, y + b.y};
+}
+Vector2 Vector2::operator-(const Vector2 &b) const {
+    return {x - b.x, y - b.y};
+}
+Vector2 Vector2::operator*(const Vector2 &b) const {
+    return {x * b.x, y * b.y};
+}
+Vector2 Vector2::operator*(const float &b) const {
+    return {x * b, y * b};
+}
 
-    static up() {
-        return new Vector2(0, 1);
-    }
-
-    static down() {
-        return new Vector2(0, -1);
-    }
-
-    static left() {
-        return new Vector2(-1, 0);
-    }
-
-    static right() {
-        return new Vector2(1, 0);
-    }
-
-    */
-/**
-     * Calculates angle between vectors
-     * @param {Vector2} a - Vector a
-     * @param {Vector2} b - Vector b
-     * @returns {number} angle between vectors a and b in degrees
-     *//*
-
-    static angle(a, b) {
-        const mag = (a.magnitude * b.magnitude);
-        if (mag < glMath.EPSILON) return 0;
-
-        return Math.acos(Vector2.dot(a, b) / (a.magnitude * b.magnitude));
-    }
-
-    */
-/**
-     * Calculates dot product of two vectors
-     * @param {Vector2} a - Vector a
-     * @param {Vector2} b - Vector b
-     * @returns {number} dot product of a and d
-     *//*
-
-    static dot(a, b) {
-        return a.x * b.x + a.y * b.y;
-    }
-
-    */
-/**
-     * Calculates cross product of two vectors
-     * @param {Vector2} a - Vector a
-     * @param {Vector2} b - Vector b
-     * @returns {number} cross product of a and d
-     *//*
-
-    static cross(a, b) {
-        return new Vector2(a.x * b.y - a.y * b.x);
-    }
-
-    */
-/**
-     * Calculates sum of two vectors
-     * @param {Vector2} a - Vector a
-     * @param {Vector2} b - Vector b
-     * @returns {number} sum of a and d
-     *//*
-
-    static sum(a, b) {
-        return new Vector2(a.x + b.y, a.y + b.y);
-    }
-
-    */
-/**
-     * Calculates sum of two vectors
-     * @param {Vector2} a - Vector a
-     * @param {Vector2} b - Vector b
-     * @returns {number} difference between a and d
-     *//*
-
-    static difference(a, b) {
-        return new Vector2(a.x - b.y, a.y - b.y);
-    }
-
-    */
-/**
-     * Calculates product of two vectors
-     * @param {Vector2} a - Vector a
-     * @param {Vector2} b - Vector b
-     * @returns {number} product of a and d
-     *//*
-
-    static product(a, b) {
-        return new Vector2(a.x * b.y, a.y * b.y);
-    }
-
-    */
-/**
-     * Calculates product of a vector and a scalar
-     * @param {Vector2} v - Vector
-     * @param {number} s - Scalar
-     * @returns {number} product of v and s
-     *//*
-
-    static productS(v, s) {
-        return new Vector2(v.x * s, v.y * s);
-    }
-
-    */
-/**
-     * Adds a vector to this instance of Vector2
-     * @param {Vector2} v - vector to add
-     *//*
-
-    add(v) {
-            this.x += v.x;
-            this.y += v.y;
-    }
-
-    */
-/**
-     * Subtracts a vector from this instance of Vector2
-     * @param {Vector2} v - vector to subtract
-     *//*
-
-    subtract(v) {
-            this.x -= v.x;
-            this.y -= v.y;
-    }
-
-    */
-/**
-     * Multiplies this instance of Vector2 by a vector
-     * @param {Vector2} v - vector to multiply by
-     *//*
-
-    multiply(v) {
-            this.x *= v.x;
-            this.y *= v.y;
-    }
-
-    */
-/**
-     * Multiplies this instance of Vector2 by a scalar
-     * @param {number} s - scalar to multiply by
-     *//*
-
-    scale(s) {
-            this.x *= s;
-            this.y *= s;
-    }
-
-    *[Symbol.iterator] () {
-        yield this.x;
-        yield this.y;
-    }
-}*/
+Vector2 Vector2::operator/(const float &b) const {
+    return {x / b, y / b};
+}

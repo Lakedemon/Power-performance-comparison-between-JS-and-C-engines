@@ -1,8 +1,9 @@
 #ifndef OPENGLENGINE_GLMATH_H
 #define OPENGLENGINE_GLMATH_H
+
 #include <cmath>
 
-class glMath {
+struct glMath {
 public:
     constexpr static const float M_PI_180 = M_PI / 180;
     constexpr static const float M_180_PI = 180 / M_PI;

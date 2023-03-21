@@ -71,3 +71,7 @@ void Shader::checkLinking(unsigned int program) {
         std::cout << "ERROR::PROGRAM_LINKING_ERROR of type: PROGRAM" << "\n" << log << std::endl;
     }
 }
+
+unsigned int Shader::getId() const {
+    return ID;
+}
