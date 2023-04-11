@@ -6,15 +6,22 @@
 #include "PBRMetallicRoughness.h"
 #include "../GL_Helpers/Shader.h"
 
-class Object3D : EmptyObject{
+class Object3D : public EmptyObject{
 private:
-    Mesh mesh;
     PBRMetallicRoughness material;
     Shader shader;
 public:
-    Object3D(Mesh mesh, Shader shader, PBRMetallicRoughness material, unsigned int tag);
+    unsigned int tag;
+
+    Object3D(Mesh mesh, Shader shader, PBRMetallicRoughness material, unsigned int tag = Tags::def);
+    Object3D() = default;
     void updateUniforms();
     void drawObject();
+    enum Tags {
+            def = 0,
+            portal = 1
+    };
+    Mesh mesh;
 };
 
 

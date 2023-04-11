@@ -1,11 +1,18 @@
+#include <vector>
+#include <iostream>
 #include "Mesh.h"
 
-Mesh::Mesh(float* position, float* normal, float* texcoord, unsigned int* index) {
-    this->_position = position;
-    this->_normal = normal;
-    this->_texcoord_0 = texcoord;
-    this->_index = index;
+Mesh::Mesh(float* position, float* normal, float* texcoord, unsigned int* index) : _position(position), _normal(normal), _texcoord_0(texcoord), _index(index) {
     createBufferedState();
+}
+
+int Mesh::drawCount() {
+    return sizeof(_index) / sizeof(*_index);
+}
+
+float Mesh::boundingRadius() {
+    //TODO: implement this as in JavaScript engine
+    return 1;
 }
 
 void Mesh::createBufferedState() {
@@ -20,6 +27,7 @@ void Mesh::createBufferedState() {
 
 void Mesh::bufferFloats(float &floats, unsigned int location) {
     GLuint buffer;
+    std::cout << floats << std::endl;
     glGenBuffers(1, &buffer);
     glBindBuffer(GL_ARRAY_BUFFER, buffer);
     glBufferData(GL_ARRAY_BUFFER, sizeof (floats), &floats, GL_STATIC_DRAW);

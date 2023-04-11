@@ -3,24 +3,29 @@
 
 #include "../Math/glMath.h"
 #include "../Math/Vector3.h"
+#include "../Math/Matrix4.h"
 
+class Matrix4;
 struct Transform {
-private:
+public:
     Vector3 position;
     Vector3 rotation;
     Vector3 scale;
-public:
-    Transform(Vector3 &position, Vector3 rotation, Vector3 scale);
+    Transform(Vector3 position, Vector3 rotation, Vector3 scale);
+    Transform(const Transform& transform);
+    Transform();
 
-    Transform copy();
-    Vector3 forward();
-    Vector3 forward2D();
-    Vector3 back();
-    Vector3 back2D();
-    Vector3 left();
-    Vector3 right();
-    Vector3 up();
-    Vector3 down();
+    void copy(const Transform& transform);
+
+    Matrix4 worldMatrix();
+    [[nodiscard]] Vector3 forward() const;
+    [[nodiscard]] Vector3 forward2D() const;
+    [[nodiscard]] Vector3 back() const;
+    [[nodiscard]] Vector3 back2D() const;
+    [[nodiscard]] Vector3 left() const;
+    [[nodiscard]] Vector3 right() const;
+    [[nodiscard]] Vector3 up() const;
+    [[nodiscard]] Vector3 down() const;
 };
 
 

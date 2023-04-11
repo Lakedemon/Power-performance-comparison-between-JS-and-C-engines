@@ -6,15 +6,16 @@
 #define OPENGLENGINE_PBRMETALLICROUGHNESS_H
 
 #include "../Math/Vector3.h"
+#include "../GL_Helpers/Shader.h"
 
 class PBRMetallicRoughness {
 private:
     Vector3 baseColor;
     float roughness, metallic;
 public:
-    explicit PBRMetallicRoughness(Vector3 baseColor = Vector3::one, float roughness = 0.5, float metallic = 0);
-    static PBRMetallicRoughness defaultMaterial();
-    void useMaterial();
+    PBRMetallicRoughness(Vector3 baseColor, float roughness, float metallic);
+    PBRMetallicRoughness();
+    void useMaterial(Shader& shader) const;
 };
 
 #endif //OPENGLENGINE_PBRMETALLICROUGHNESS_H

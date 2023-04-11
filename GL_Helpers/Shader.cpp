@@ -1,13 +1,14 @@
 #include "Shader.h"
 
-Shader::Shader(const char* vsPath, const char* fsPath){
-    std::string vSource = loadShaderFile(vsPath);
-    std::string fSource = loadShaderFile(fsPath);
+Shader::Shader(const std::string& vsPath, const std::string& fsPath){
+    std::string vSource = loadShaderFile(Config::shaderPath + vsPath);
+    std::string fSource = loadShaderFile(Config::shaderPath + fsPath);
 
     const char * vs = vSource.c_str();
     const char * fs = fSource.c_str();
 
     ID = glCreateProgram();
+    std::cout << "SUCCESS::PROGRAM::PROGRAM_SUCCESSFULLY_CREATED" << std::endl;
     initShader(vs, GL_VERTEX_SHADER);
     initShader(fs, GL_FRAGMENT_SHADER);
 
@@ -15,7 +16,11 @@ Shader::Shader(const char* vsPath, const char* fsPath){
     checkLinking(ID);
 }
 
-std::string Shader::loadShaderFile(const char * path){
+Shader::Shader(){}
+
+std::string Shader::loadShaderFile(const std::string& path){
+    std::cout << "READING::SHADER::PATH: " << path << std::endl;
+
     std::ifstream file;
     std::string contents;
 
@@ -32,6 +37,8 @@ std::string Shader::loadShaderFile(const char * path){
     {
         std::cout << "ERROR::SHADER::FILE_NOT_SUCCESSFULLY_READ: " << e.what() << std::endl;
     }
+
+    std::cout << "SUCCESS::SHADER::FILE_SUCCESSFULLY_READ" << std::endl;
 
     return contents;
 }
@@ -63,7 +70,7 @@ void Shader::checkCompile(unsigned int shader) {
 void Shader::checkLinking(unsigned int program) {
     int status;
 
-    glGetProgramiv(program, GL_COMPILE_STATUS, &status);
+    glGetProgramiv(program, GL_LINK_STATUS, &status);
     if(status != GL_TRUE){
         unsigned short logSize = 1024;
         char log[logSize];

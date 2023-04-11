@@ -26,6 +26,7 @@ struct Vector2 {
 
     Vector2 operator+(const Vector2 &b) const;
     Vector2 operator-(const Vector2 &b) const;
+    Vector2 operator-() const;
     Vector2 operator*(const Vector2 &b) const;
     Vector2 operator*(const float &b) const;
     Vector2 operator/(const float &b) const;

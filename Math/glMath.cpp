@@ -1,5 +1,4 @@
 #include "glMath.h"
-#include <cmath>
 
 float glMath::toDeg(float r){
     return r * M_180_PI;

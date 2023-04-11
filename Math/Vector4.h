@@ -7,6 +7,7 @@
 struct Vector4 {
     float x, y, z, w;
     Vector4(float x, float y, float z, float w);
+    explicit Vector4(const float* xyzw);
 
     [[nodiscard]] float magnitude() const;
     [[nodiscard]] Vector4 normalized() const;
@@ -21,6 +22,7 @@ struct Vector4 {
 
     Vector4 operator+(const Vector4 &b) const;
     Vector4 operator-(const Vector4 &b) const;
+    Vector4 operator-() const;
     Vector4 operator*(const Vector4 &b) const;
     Vector4 operator*(const float &b) const;
     Vector4 operator/(const float &b) const;

@@ -7,6 +7,8 @@
 struct Vector3 {
     float x, y, z;
     Vector3(float x, float y, float z);
+    explicit Vector3(const float* xyz);
+    Vector3();
 
     [[nodiscard]] float magnitude() const;
     [[nodiscard]] Vector3 normalized() const;
@@ -29,6 +31,7 @@ struct Vector3 {
 
     Vector3 operator+(const Vector3 &b) const;
     Vector3 operator-(const Vector3 &b) const;
+    Vector3 operator-() const;
     Vector3 operator*(const Vector3 &b) const;
     Vector3 operator*(const float &b) const;
     Vector3 operator/(const float &b) const;

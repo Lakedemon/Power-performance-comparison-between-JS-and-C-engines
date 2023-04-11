@@ -1,21 +1,18 @@
 #include "Vector2.h"
 
-Vector2::Vector2(float x, float y) {
-    this->x = x;
-    this->y = y;
-}
+Vector2::Vector2(float x, float y) : x(x), y(y) {}
 
 float Vector2::magnitude() const {
     return std::sqrt(x * x + y * y);
 }
 
 Vector2 Vector2::normalized() const {
-    float length = magnitude();
+    float const length = magnitude();
     if (length < glMath::EPSILON){
         return zero;
     }
 
-    float lengthInv = 1 / length;
+    float const lengthInv = 1 / length;
     return {x * lengthInv, y * lengthInv};
 }
 
@@ -35,7 +32,7 @@ float Vector2::distance(Vector2 a, Vector2 b) {
 }
 
 float Vector2::angle(Vector2 a, Vector2 b) {
-    float mag = (a.magnitude() * b.magnitude());
+    float const mag = (a.magnitude() * b.magnitude());
     if(mag < glMath::EPSILON){return 0;}
     return std::acos(dot(a, b) / mag);
 }
@@ -52,6 +49,9 @@ Vector2 Vector2::operator+(const Vector2 &b) const {
 }
 Vector2 Vector2::operator-(const Vector2 &b) const {
     return {x - b.x, y - b.y};
+}
+Vector2 Vector2::operator-() const {
+    return {-x, -y};
 }
 Vector2 Vector2::operator*(const Vector2 &b) const {
     return {x * b.x, y * b.y};

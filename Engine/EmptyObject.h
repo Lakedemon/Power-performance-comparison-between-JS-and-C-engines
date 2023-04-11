@@ -3,12 +3,12 @@
 
 #include "Transform.h"
 
-class EmptyObject {
-private:
-    Transform transform;
+struct EmptyObject {
 public:
+    Transform transform;
+
     EmptyObject();
-    ~EmptyObject();
+    Matrix4 worldMatrix();
     void setPosition(Vector3 v);
     void setRotation(Vector3 v);
     void setScale(Vector3 v);

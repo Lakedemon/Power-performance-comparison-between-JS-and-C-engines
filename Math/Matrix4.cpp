@@ -1,15 +1,9 @@
 #include "Matrix4.h"
 
-#include <cmath>
-
-Matrix4::Matrix4(const float entries[16]) {
-    for ( int i = 0; i < 16; ++i){
-        this->entries[i] = entries[i];
-    }
-}
-
-Matrix4::Matrix4(float _00, float _01, float _02, float _03, float _10, float _11, float _12, float _13, float _20,
-                 float _21, float _22, float _23, float _30, float _31, float _32, float _33) {
+Matrix4::Matrix4(float _00, float _01, float _02, float _03,
+                 float _10, float _11, float _12, float _13,
+                 float _20, float _21, float _22, float _23,
+                 float _30, float _31, float _32, float _33) {
     this->entries[0] = _00;
     this->entries[1] = _01;
     this->entries[2] = _02;
@@ -27,6 +21,67 @@ Matrix4::Matrix4(float _00, float _01, float _02, float _03, float _10, float _1
     this->entries[14] = _32;
     this->entries[15] = _33;
 }
+
+Matrix4::Matrix4(const float entries[16]) {
+    copyEntries(entries);
+}
+
+Matrix4::Matrix4(Matrix4 &matrix4) : Matrix4(matrix4.entries) {}
+
+Matrix4::Matrix4(Transform &transform, bool inverse) {
+    auto [tx, ty, tz] = transform.position;
+    auto [rx, ry, rz] = transform.rotation;
+    auto [sx, sy, sz] = transform.scale;
+
+    float c = std::cos(rx);
+    float s = std::sin(rx);
+
+    float a = std::cos(ry);
+    float b = std::sin(ry);
+
+    float q = std::cos(rz);
+    float w = std::sin(rz);
+
+    float bs = b * s;
+    float cq = c * q;
+    float cw = c * w;
+
+    if(inverse) {
+        float i = 1/sx;
+        float o = 1/sy;
+        float p = 1/sz;
+
+        float ap = a*p;
+
+        float m00 = a*q*i;
+        float m10 = (cw+bs*q) * i;
+        float m20 = (w*s-b*cq) * i;
+
+        float m01 = a*o*w;
+        float m11 = (cq-bs*w) * o;
+        float m21 = (b*cw+q*s) * o;
+
+        float m02 = b*p;
+        float m12 = ap*s;
+        float m22 = ap*c;
+
+        Matrix4(
+            m00, m10, m20, 0,
+            -m01, m11, m21, 0,
+            m02, -m12, m22, 0,
+            m01 * ty - m02 * tz - m00 * tx, m12 * tz - m11 * ty - m10 * tx, -m21 * ty - m22 * tz - m20 * tx, 1
+            );
+    } else {
+        Matrix4(
+            a * q * sx, -a * w * sx, b * sx, 0,
+            (cw + bs * q) * sy, (cq - bs * w) * sy, -a * s * sy, 0,
+            (s * w - cq * b) * sz, (cw * b + s * q) * sz, c * a * sz, 0,
+            tx, ty, tz, 1
+        );
+    }
+}
+
+Matrix4::Matrix4() : Matrix4(Matrix4::identity){}
 
 Matrix4 Matrix4::translation(Vector3 &v) {
     return {1, 0, 0, 0,
@@ -98,22 +153,7 @@ Vector3 Matrix4::rotation() {
 }
 
 Matrix4 Matrix4::inverse() {
-    float m00 = this->entries[0];
-    float m01 = this->entries[1];
-    float m02 = this->entries[2];
-    float m03 = this->entries[3];
-    float m10 = this->entries[4];
-    float m11 = this->entries[5];
-    float m12 = this->entries[6];
-    float m13 = this->entries[7];
-    float m20 = this->entries[8];
-    float m21 = this->entries[9];
-    float m22 = this->entries[10];
-    float m23 = this->entries[11];
-    float m30 = this->entries[12];
-    float m31 = this->entries[13];
-    float m32 = this->entries[14];
-    float m33 = this->entries[15];
+    auto [m00, m01, m02, m03, m10, m11, m12, m13, m20, m21, m22, m23, m30, m31, m32, m33] = this->entries;
 
     float tmp0 = m22 * m33;
     float tmp1 = m32 * m23;
@@ -163,10 +203,6 @@ Matrix4 Matrix4::inverse() {
     };
 }
 
-Matrix4 Matrix4::copy() {
-    return {entries};
-}
-
 Matrix4 Matrix4::transpose() {
     return {
             entries[0], entries[4], entries[8], entries[12],
@@ -191,7 +227,6 @@ Vector4 Matrix4::getRow(int n) {
     entries[n*4 + 3],
     };
 }
-
 void Matrix4::setColumn(int n, Vector4 v) {
     entries[n] = v.x;
     entries[n + 4] = v.y;
@@ -207,9 +242,9 @@ Vector4 Matrix4::getColumn(int n) {
     entries[n + 12],
     };
 }
+Matrix4 Matrix4::identity = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1};
 
-const Matrix4 Matrix4::identity = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1};
-const Matrix4 Matrix4::zero = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+Matrix4 Matrix4::zero = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
 Matrix4 Matrix4::perspective(float fov, float aspect, float near, float far) {
     const float f = tan(M_PI * 0.5 - 0.5 * fov);
@@ -266,63 +301,45 @@ void Matrix4::clipRevProjectionMatrix(Vector4 clipPlane) {
     entries[14] = n * clipPlane.w;
 }
 
-/*Todo
-    Matrix4 Matrix4::rotateX(float r) {
-        Matrix4 b = * this;
-        return b * rotationX(r);
-        return *this;
-    }
-    Matrix4 Matrix4::rotateY(float r) {
-        return Matrix4(nullptr);
-    }
-    Matrix4 Matrix4::rotateZ(float r) {
-        return Matrix4(nullptr);
-    }
-    Matrix4 Matrix4::translate(Vector3 &v) {
-        return Matrix4(nullptr);
-    }
-    Matrix4 Matrix4::rotate(Vector3 &v) {
-        return Matrix4(nullptr);
-    }
-    Matrix4 Matrix4::scale(Vector3 &v) {
-        return Matrix4(nullptr);
-    }
-*/
+Matrix4 Matrix4::rotateX(float r) {
+    Matrix4 tMat = rotationX(r);
+    return *this *= tMat;
+}
 
-Matrix4 Matrix4::operator*(Matrix4 &b) {
-    float a00 = this->entries[0];
-    float a01 = this->entries[1];
-    float a02 = this->entries[2];
-    float a03 = this->entries[3];
-    float a10 = this->entries[4];
-    float a11 = this->entries[5];
-    float a12 = this->entries[6];
-    float a13 = this->entries[7];
-    float a20 = this->entries[8];
-    float a21 = this->entries[9];
-    float a22 = this->entries[10];
-    float a23 = this->entries[11];
-    float a30 = this->entries[12];
-    float a31 = this->entries[13];
-    float a32 = this->entries[14];
-    float a33 = this->entries[15];
+Matrix4 Matrix4::rotateY(float r) {
+    Matrix4 tMat = rotationY(r);
+    return *this *= tMat;
+}
 
-    float b00 = b.entries[0];
-    float b01 = b.entries[1];
-    float b02 = b.entries[2];
-    float b03 = b.entries[3];
-    float b10 = b.entries[4];
-    float b11 = b.entries[5];
-    float b12 = b.entries[6];
-    float b13 = b.entries[7];
-    float b20 = b.entries[8];
-    float b21 = b.entries[9];
-    float b22 = b.entries[10];
-    float b23 = b.entries[11];
-    float b30 = b.entries[12];
-    float b31 = b.entries[13];
-    float b32 = b.entries[14];
-    float b33 = b.entries[15];
+Matrix4 Matrix4::rotateZ(float r) {
+    Matrix4 tMat = rotationZ(r);
+    return *this *= tMat;
+}
+
+Matrix4 Matrix4::rotate(Vector3 &v) {
+    return rotateX(v.x).rotateY(v.y).rotateZ(v.z);
+}
+
+Matrix4 Matrix4::translate(Vector3 &v) {
+    Matrix4 tMat = translation(v);
+    return *this *= tMat;
+}
+
+Matrix4 Matrix4::scale(Vector3 &v) {
+    Matrix4 tMat = scalation(v);
+    return *this *= tMat;
+}
+
+void Matrix4::copyEntries(const float *entriesToCopy) {
+    for ( int i = 0; i < 16; ++i){
+        this->entries[i] = entriesToCopy[i];
+    }
+}
+
+Matrix4 Matrix4::operator*(const Matrix4 &b) {
+    auto [a00, a01, a02, a03, a10, a11, a12, a13, a20, a21, a22, a23, a30, a31, a32, a33] = this->entries;
+    auto [b00, b01, b02, b03, b10, b11, b12, b13, b20, b21, b22, b23, b30, b31, b32, b33] = b.entries;
+
 
     return {
     b00 * a00 + b01 * a10 + b02 * a20 + b03 * a30,
@@ -342,5 +359,45 @@ Matrix4 Matrix4::operator*(Matrix4 &b) {
     b30 * a02 + b31 * a12 + b32 * a22 + b33 * a32,
     b30 * a03 + b31 * a13 + b32 * a23 + b33 * a33
     };
+}
+
+Matrix4& Matrix4::operator=(const Matrix4 &b) {
+    if (this == &b) {
+        return *this;
+    }
+
+    copyEntries(b.entries);
+    return *this;
+}
+
+Matrix4& Matrix4::operator*=(const Matrix4 &b) {
+    return *this = *this * b;
+}
+
+Vector4 Matrix4::operator*(const Vector4 &v) {
+    return {
+            entries[0] * v.x + entries[1] * v.y + entries[2] * v.z + entries[3] * v.w,
+            entries[4] * v.x + entries[5] * v.y + entries[6] * v.z + entries[7] * v.w,
+            entries[8] * v.x + entries[9] * v.y + entries[10] * v.z + entries[11] * v.w,
+            entries[12] * v.x + entries[13] * v.y + entries[14] * v.z + entries[15] * v.w,
+    };
+}
+
+Vector3 Matrix4::operator*(const Vector3 &v) {
+    const float num = 1 / (entries[4] *  v.x +  entries[7] *  v.y +  entries[11] *  v.z + entries[15]);
+
+    return {
+            (entries[0] * v.x + entries[4] * v.y + entries[8] * v.z + entries[12]) * num,
+            (entries[1] * v.x + entries[5] * v.y + entries[9] * v.z + entries[13]) * num,
+            (entries[2] * v.x + entries[6] * v.y + entries[10] * v.z + entries[14]) * num,
+    };
+}
+
+Matrix4::operator Transform() {
+    Vector3 p = position();
+    Vector3 s = size();
+    Vector3 r = rotation();
+
+    return {p, s, r};
 }
 

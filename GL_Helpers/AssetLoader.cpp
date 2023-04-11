@@ -1,9 +1,5 @@
 #include "AssetLoader.h"
 
-int main(){
-    cout << AssetLoader::loadGLTF("gl_separate.gltf").buffers[0].size();
-}
-
 AssetLoader::gltf AssetLoader::loadGLTF(const string& filePath, const string& assetPath) {
     Json::Value j = loadJSON(filePath, assetPath);
 

@@ -1,4 +1,4 @@
-#version 460 core
+#version 420 core
 precision highp float;
 
 in vec3 v_normal;
