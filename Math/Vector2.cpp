@@ -24,7 +24,7 @@ Vector2 Vector2::left = {-1, 0};
 Vector2 Vector2::right = {1, 0};
 
 int Vector2::side(Vector2 depended, Vector2 control, Vector2 normal) {
-    return std::signbit(dot(depended - control, normal));
+    return glMath::sign(dot(depended - control, normal));
 }
 
 float Vector2::distance(Vector2 a, Vector2 b) {

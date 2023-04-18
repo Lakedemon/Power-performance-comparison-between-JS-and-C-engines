@@ -24,11 +24,6 @@ float glMath::toPower (float intensity){
     return 4 * M_PI * intensity / LUMENS_PER_WATT;
 }
 
-/*static std::map<int, > = {
-        5120: Int8Array,
-        5121: Uint8Array,
-        5122: Int16Array,
-        5123: Uint16Array,
-        5125: Uint32Array,
-        5126: Float32Array,
-}*/
+int glMath::sign(float n) {
+    return std::signbit(n) == 1 ? -1 : 1;
+}

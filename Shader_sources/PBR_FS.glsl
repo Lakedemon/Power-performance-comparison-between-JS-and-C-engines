@@ -21,7 +21,7 @@ out vec4 outColor;
 float PI = 3.14159265359;
 
 float flatDot(vec3 a, vec3 b){
-    return max(dot(a, b), 0.0);
+    return min(max(dot(a, b), 0.0), 1.0);
 }
 
 vec3 sRGBtoLinear(vec3 rgb){

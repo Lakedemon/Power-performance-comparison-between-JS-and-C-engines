@@ -65,14 +65,14 @@ Matrix4::Matrix4(Transform &transform, bool inverse) {
         float m12 = ap*s;
         float m22 = ap*c;
 
-        Matrix4(
+        copyEntries(
             m00, m10, m20, 0,
             -m01, m11, m21, 0,
             m02, -m12, m22, 0,
             m01 * ty - m02 * tz - m00 * tx, m12 * tz - m11 * ty - m10 * tx, -m21 * ty - m22 * tz - m20 * tx, 1
-            );
+        );
     } else {
-        Matrix4(
+        copyEntries(
             a * q * sx, -a * w * sx, b * sx, 0,
             (cw + bs * q) * sy, (cq - bs * w) * sy, -a * s * sy, 0,
             (s * w - cq * b) * sz, (cw * b + s * q) * sz, c * a * sz, 0,
@@ -81,7 +81,7 @@ Matrix4::Matrix4(Transform &transform, bool inverse) {
     }
 }
 
-Matrix4::Matrix4() : Matrix4(Matrix4::identity){}
+Matrix4::Matrix4() : Matrix4(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1){}
 
 Matrix4 Matrix4::translation(Vector3 &v) {
     return {1, 0, 0, 0,
@@ -242,9 +242,13 @@ Vector4 Matrix4::getColumn(int n) {
     entries[n + 12],
     };
 }
-Matrix4 Matrix4::identity = {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1};
+Matrix4 Matrix4::identity() {
+    return {1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1};
+}
 
-Matrix4 Matrix4::zero = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+Matrix4 Matrix4::zero() {
+    return {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+}
 
 Matrix4 Matrix4::perspective(float fov, float aspect, float near, float far) {
     const float f = tan(M_PI * 0.5 - 0.5 * fov);
@@ -273,8 +277,8 @@ Matrix4 Matrix4::lookAt(Vector3 &eye, Vector3 &target, Vector3 &up) {
 
 void Matrix4::clipProjectionMatrix(Vector4 clipPlane) {
     const Vector4 vcamera = Vector4(
-        (std::signbit(clipPlane.x) - entries[8]) / entries[0],
-        (std::signbit(clipPlane.y) - entries[9]) / entries[5],
+        (glMath::sign(clipPlane.x) - entries[8]) / entries[0],
+        (glMath::sign(clipPlane.y) - entries[9]) / entries[5],
         1,
         (entries[10] / entries[14])
     );
@@ -288,8 +292,8 @@ void Matrix4::clipProjectionMatrix(Vector4 clipPlane) {
 
 void Matrix4::clipRevProjectionMatrix(Vector4 clipPlane) {
     const Vector4 vcamera = Vector4(
-        (std::signbit(clipPlane.x) - entries[8]) / entries[0],
-        (std::signbit(clipPlane.y) - entries[9]) / entries[5],
+        (glMath::sign(clipPlane.x) - entries[8]) / entries[0],
+        (glMath::sign(clipPlane.y) - entries[9]) / entries[5],
         1,
         ((1 - entries[10]) / entries[14])
     );
@@ -334,6 +338,28 @@ void Matrix4::copyEntries(const float *entriesToCopy) {
     for ( int i = 0; i < 16; ++i){
         this->entries[i] = entriesToCopy[i];
     }
+}
+
+void Matrix4::copyEntries(float _00, float _01, float _02, float _03,
+                          float _10, float _11, float _12, float _13,
+                          float _20, float _21, float _22, float _23,
+                          float _30, float _31, float _32, float _33) {
+    this->entries[0] = _00;
+    this->entries[1] = _01;
+    this->entries[2] = _02;
+    this->entries[3] = _03;
+    this->entries[4] = _10;
+    this->entries[5] = _11;
+    this->entries[6] = _12;
+    this->entries[7] = _13;
+    this->entries[8] = _20;
+    this->entries[9] = _21;
+    this->entries[10] = _22;
+    this->entries[11] = _23;
+    this->entries[12] = _30;
+    this->entries[13] = _31;
+    this->entries[14] = _32;
+    this->entries[15] = _33;
 }
 
 Matrix4 Matrix4::operator*(const Matrix4 &b) {
@@ -384,12 +410,13 @@ Vector4 Matrix4::operator*(const Vector4 &v) {
 }
 
 Vector3 Matrix4::operator*(const Vector3 &v) {
-    const float num = 1 / (entries[4] *  v.x +  entries[7] *  v.y +  entries[11] *  v.z + entries[15]);
+    auto [m00, m01, m02, m03, m10, m11, m12, m13, m20, m21, m22, m23, m30, m31, m32, m33] = this->entries;
+    const float num = 1 / (m03 * v.x +  m13 *  v.y + m23 * v.z + m33);
 
     return {
-            (entries[0] * v.x + entries[4] * v.y + entries[8] * v.z + entries[12]) * num,
-            (entries[1] * v.x + entries[5] * v.y + entries[9] * v.z + entries[13]) * num,
-            (entries[2] * v.x + entries[6] * v.y + entries[10] * v.z + entries[14]) * num,
+            (m00 * v.x + m10 * v.y + m20 * v.z + m30) * num,
+            (m01 * v.x + m11 * v.y + m21 * v.z + m31) * num,
+            (m02 * v.x + m12 * v.y + m22 * v.z + m32) * num,
     };
 }
 
@@ -399,5 +426,15 @@ Matrix4::operator Transform() {
     Vector3 r = rotation();
 
     return {p, s, r};
+}
+
+Vector3 Matrix4::multiplyVector(Vector3 v) {
+    auto [m00, m01, m02, m03, m10, m11, m12, m13, m20, m21, m22, m23, m30, m31, m32, m33] = this->entries;
+
+    return {
+            (m00 * v.x + m10 * v.y + m20 * v.z),
+            (m01 * v.x + m11 * v.y + m21 * v.z),
+            (m02 * v.x + m12 * v.y + m22 * v.z),
+    };
 }
 

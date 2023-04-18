@@ -14,7 +14,7 @@ public:
     Shader();
     [[nodiscard]] unsigned int getId() const;
 private:
-    unsigned int ID{};
+    unsigned int ID;
     static std::string loadShaderFile(const std::string& path);
     void initShader(const char* shaderCode, GLenum shaderType) const;
     static void checkCompile(unsigned int shader);

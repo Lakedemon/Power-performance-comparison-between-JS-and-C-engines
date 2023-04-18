@@ -16,7 +16,7 @@ Matrix4 Transform::worldMatrix() {
 
 Vector3 Transform::forward() const {
     const float x = rotation.x;
-    const float y = rotation.x;
+    const float y = rotation.y;
 
     const float c = std::cos(y);
     Vector3 v = {-std::sin(y), c * std::sin(x), c * std::cos(x)};
@@ -25,7 +25,7 @@ Vector3 Transform::forward() const {
 
 Vector3 Transform::forward2D() const {
     const float x = rotation.x;
-    const float y = rotation.x;
+    const float y = rotation.y;
 
     const float c = std::cos(y);
     Vector3 v = {-std::sin(y), 0, c * std::cos(x)};
@@ -51,7 +51,7 @@ Vector3 Transform::right() const {
 
 Vector3 Transform::up() const {
     const float x = rotation.x;
-    const float y = rotation.x;
+    const float y = rotation.y;
 
     const float s = std::sin(y);
     Vector3 v = {std::cos(y), /*s * Math.cos(x)*/0, s * std::cos(x)};

@@ -8,8 +8,7 @@
 #include "Object3D.h"
 #include "PointLight.h"
 #include "../Math/Vector4.h"
-#include "../GL_Helpers/AssetLoader.h"
-
+#include "Animation/Animator.h"
 
 class SceneGraph {
 private:
@@ -21,7 +20,17 @@ private:
         const char* link;
     };
 
+    struct cmp_str
+    {
+        bool operator()(char const *a, char const *b) const
+        {
+            return std::strcmp(a, b) < 0;
+        }
+    };
+
     struct PortalLink{
+        PortalLink(Object3D& master, Object3D& link, int side) : master(master), link(link), side(side){};
+
         Object3D& master;
         Object3D& link;
         int side = 0;
@@ -29,27 +38,29 @@ private:
 
     std::vector<enum Object3D::Tags>portalExceptionTags = {Object3D::Tags::portal};
     std::vector<PortalLink> portalLinks;
-    std::map<const char*, Object3D> objects;
-    std::map<const char*, PointLight> lights;
-    std::map<const char*, Mesh> meshes;
-    std::map<const char*, PBRMetallicRoughness> materials;
+    std::vector<Animator> animations;
+    std::map<const char*, Object3D, cmp_str> objects;
+    std::map<const char*, PointLight, cmp_str> lights;
+    std::map<const char*, Mesh, cmp_str> meshes;
+    std::map<const char*, PBRMetallicRoughness, cmp_str> materials;
 
     template<typename T>
-    static T* dataFromAccessor(std::vector<char>& data, unsigned int byteLength, unsigned int byteOffset);
+    std::vector<T> dataFromAccessor(std::vector<T> value, std::ifstream &inFile, unsigned int byteLength, unsigned int byteOffset);
 
     void setMainCamera(Camera& camera);
     void updateActiveCamera(Camera& camera);
-    void updateActiveCamera(Matrix4 &projection, Matrix4 &view, Vector3 &position);
+    void updateActiveCamera(Matrix4 &projection, Matrix4 view, Vector3 &position);
 
     void setLights();
 public:
     explicit SceneGraph(Shader &shader);
-    SceneGraph(const AssetLoader::gltf& loadedFile, Shader &shader);
+    SceneGraph(Json::Value gltf, Shader &shader);
     SceneGraph() = default;
-    void portalDraw();
 
+    void animate(float t);
     void updateScene(Vector4 clearColor = Vector4{Config::clearColor});
     void defaultDraw(std::vector<enum Object3D::Tags> exceptionTags);
+    void portalDraw();
 };
 
 

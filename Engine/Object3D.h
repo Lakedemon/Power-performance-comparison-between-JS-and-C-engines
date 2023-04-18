@@ -11,9 +11,10 @@ private:
     PBRMetallicRoughness material;
     Shader shader;
 public:
+    Mesh mesh;
     unsigned int tag;
 
-    Object3D(Mesh mesh, Shader shader, PBRMetallicRoughness material, unsigned int tag = Tags::def);
+    Object3D(Mesh& mesh, Shader& shader, PBRMetallicRoughness& material, unsigned int tag = Tags::def);
     Object3D() = default;
     void updateUniforms();
     void drawObject();
@@ -21,7 +22,6 @@ public:
             def = 0,
             portal = 1
     };
-    Mesh mesh;
 };
 
 

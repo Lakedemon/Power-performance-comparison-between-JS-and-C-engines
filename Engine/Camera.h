@@ -1,7 +1,3 @@
-//
-// Created by leoni on 19/03/2023.
-//
-
 #ifndef OPENGLENGINE_CAMERA_H
 #define OPENGLENGINE_CAMERA_H
 
@@ -22,8 +18,8 @@ public:
     Matrix4 viewMat();
     Matrix4 projectionMatrix;
     void resetProjection();
-    static Vector4 clippingPlane(Transform plane, Matrix4 viewMat, unsigned int side);
-    Matrix4 relativeMirror(Matrix4 from, Matrix4 to);
+    static Vector4 clippingPlane(const Transform& plane, Matrix4 viewMat, int side);
+    Matrix4 relativeMirror(const Matrix4& from, Matrix4 to);
 };
 
 

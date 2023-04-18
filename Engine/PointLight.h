@@ -1,7 +1,3 @@
-//
-// Created by leoni on 23/03/2023.
-//
-
 #ifndef OPENGLENGINE_POINTLIGHT_H
 #define OPENGLENGINE_POINTLIGHT_H
 

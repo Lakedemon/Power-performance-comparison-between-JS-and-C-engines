@@ -3,6 +3,7 @@
 
 #include "glMath.h"
 #include <cmath>
+#include "Vector4.h"
 
 struct Vector3 {
     float x, y, z;
@@ -28,13 +29,17 @@ struct Vector3 {
     static float distance(Vector3 a, Vector3 b);
     static Vector3 cross(Vector3 a, Vector3 b);
     static Vector3 QuaternionToEuler(float qx, float qy, float qz, float qw);
+    static Vector3 QuaternionToEuler(Vector4 v);
 
     Vector3 operator+(const Vector3 &b) const;
     Vector3 operator-(const Vector3 &b) const;
     Vector3 operator-() const;
     Vector3 operator*(const Vector3 &b) const;
+    Vector3 operator*=(const Vector3 &b);
     Vector3 operator*(const float &b) const;
     Vector3 operator/(const float &b) const;
+
+
 };
 
 #endif //OPENGLENGINE_VECTOR3_H

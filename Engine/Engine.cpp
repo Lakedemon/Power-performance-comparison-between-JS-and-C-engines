@@ -4,8 +4,10 @@ void Engine::renderLoop() {
     while (!glfwWindowShouldClose(window)) {
         processInput(window);
 
+        this->updateTime();
+        activeScene.animate(timer / 1000);
         activeScene.updateScene();
-        activeScene.defaultDraw({});
+        activeScene.portalDraw();
 
         glfwSwapBuffers(window);
         glfwPollEvents();
@@ -16,25 +18,19 @@ void Engine::start() {
     this->renderLoop();
 }
 
-Engine::Engine(GLFWwindow* window): window(window) {
-    Shader mainShader = Shader{"PBR_VS.glsl", "PBR_FS.glsl"};
-    this->activeScene = SceneGraph{AssetLoader::loadGLTF("ShapeMuseum.gltf"), mainShader};
+Engine::Engine(GLFWwindow* window, const std::string& vsName, const std::string& fsName, const std::string& gltfName): window(window) {
+    startTime = std::chrono::steady_clock::now();
+    Shader mainShader = Shader{vsName, fsName};
+    this->activeScene = SceneGraph{AssetLoader::loadJSON(gltfName), mainShader};
 }
 
-// process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
-// ---------------------------------------------------------------------------------------------------------
-void Engine::processInput(GLFWwindow *window)
-{
-    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+void Engine::processInput(GLFWwindow *window) {
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, true);
+    }
 }
 
-// glfw: whenever the window side changed (by OS or user resize) this callback function executes
-// ---------------------------------------------------------------------------------------------
-void Engine::framebuffer_size_callback(GLFWwindow* window, int width, int height)
-{
-    // make sure the viewport matches the new window dimensions; note that width and
-    // height will be significantly larger than specified on retina displays.
+void Engine::resizeWindow(GLFWwindow *window, int width, int height) {
     glViewport(0, 0, width, height);
 }
 
@@ -48,16 +44,20 @@ GLFWwindow *Engine::initGLFW(int screenWidth, int screenHeight) {
     GLFWwindow* window = glfwCreateWindow(screenWidth, screenHeight, "OpenGLEngine", nullptr, nullptr);
     if (window == nullptr)
     {
-        std::cout << "Failed to create GLFW window" << std::endl;
+        std::cout << "ERROR::GLAD::FAILED_TO_CREATE_WINDOW" << std::endl;
         glfwTerminate();
     }
     glfwMakeContextCurrent(window);
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
+    glfwSetFramebufferSizeCallback(window, resizeWindow);
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
     {
-        std::cout << "Failed to initialize GLAD" << std::endl;
+        std::cout << "ERROR::GLAD::FAILED_TO_INITIALIZE" << std::endl;
     }
 
     return window;
+}
+
+void Engine::updateTime() {
+    timer = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - startTime).count();
 }

@@ -27,7 +27,7 @@ Vector3 Vector3::forward = {0, 0, 1};
 Vector3 Vector3::back = {0, 0, -1};
 
 int Vector3::side(Vector3 depended, Vector3 control, Vector3 normal) {
-    return std::signbit(dot(depended - control, normal));
+    return glMath::sign(dot(depended - control, normal));
 }
 
 float Vector3::angle(Vector3 a, Vector3 b) {
@@ -66,6 +66,11 @@ Vector3 Vector3::QuaternionToEuler(float qx, float qy, float qz, float qw) {
     return {x, y, z};
 }
 
+Vector3 Vector3::QuaternionToEuler(Vector4 v) {
+    auto [qx, qy, qz, qw] = v;
+    return QuaternionToEuler(qx, qy, qz, qw);
+}
+
 Vector3 Vector3::operator+(const Vector3 &b) const {
     return {x + b.x, y + b.y, z + b.z};
 }
@@ -80,6 +85,12 @@ Vector3 Vector3::operator*(const Vector3 &b) const {
 }
 Vector3 Vector3::operator*(const float &b) const {
     return {x * b, y * b, z * b};
+}
+Vector3 Vector3::operator*=(const Vector3 &b) {
+    x *= b.x;
+    y *= b.y;
+    z *= b.z;
+    return *this;
 }
 Vector3 Vector3::operator/(const float &b) const {
     return {x / b, y / b, z / b};

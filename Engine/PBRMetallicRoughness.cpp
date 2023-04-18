@@ -4,7 +4,7 @@ PBRMetallicRoughness::PBRMetallicRoughness(Vector3 baseColor, float roughness, f
 PBRMetallicRoughness::PBRMetallicRoughness() : PBRMetallicRoughness(Vector3::one, 0.5, 0){}
 
 void PBRMetallicRoughness::useMaterial(Shader &shader) const {
-    glUniform3f(glGetUniformLocation(shader.getId(), "baseColor"), baseColor.x, baseColor.y, baseColor.z);
-    glUniform1f(glGetUniformLocation(shader.getId(), "roughness"), roughness);
-    glUniform1f(glGetUniformLocation(shader.getId(), "metallic"), metallic);
+    glUniform3f(glGetUniformLocation(shader.getId(), "u_baseColor"), baseColor.x, baseColor.y, baseColor.z);
+    glUniform1f(glGetUniformLocation(shader.getId(), "u_roughness"), roughness);
+    glUniform1f(glGetUniformLocation(shader.getId(), "u_metallic"), metallic);
 }

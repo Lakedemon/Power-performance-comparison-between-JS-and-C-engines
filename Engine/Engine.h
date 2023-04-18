@@ -1,30 +1,28 @@
-//
-// Created by leoni on 26/03/2023.
-//
-
 #ifndef OPENGLENGINE_ENGINE_H
 #define OPENGLENGINE_ENGINE_H
 
-
+#include "../GL_Helpers/AssetLoader.h"
 #include "SceneGraph.h"
 #include <GLFW/glfw3.h>
 #include <iostream>
 #include <utility>
+#include <chrono>
+
 
 class Engine {
 private:
-    unsigned int timer = 0;
+    std::chrono::steady_clock::time_point startTime;
+    float timer = 0;
     SceneGraph activeScene;
 
-    static void framebuffer_size_callback(GLFWwindow* window, int width, int height);
+    static void resizeWindow(GLFWwindow* window, int width, int height);
     static void processInput(GLFWwindow *window);
 
     GLFWwindow* window;
     void renderLoop();
-    /*void resizeCanvas();
-    void updateTime();*/
+    void updateTime();
 public:
-    explicit Engine(GLFWwindow* window);
+    Engine(GLFWwindow* window, const std::string& vsName, const std::string& fsName, const std::string& gltfName);
     void start();
     static GLFWwindow* initGLFW(int screenWidth, int screenHeight);
 };

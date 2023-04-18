@@ -54,7 +54,7 @@ Vector4 Vector4::operator/(const float &b) const {
 }
 
 int Vector4::side(Vector4 depended, Vector4 control, Vector4 normal) {
-    return std::signbit(dot(depended - control, normal));
+    return glMath::sign(dot(depended - control, normal));
 }
 
 float Vector4::distance(Vector4 a, Vector4 b) {

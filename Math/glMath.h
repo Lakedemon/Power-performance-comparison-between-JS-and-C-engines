@@ -16,6 +16,8 @@ public:
     static float toHFOV(float fov, float aspect);
     static float toYFOV(float fov, float aspect);
     static float toPower(float intensity);
+
+    static int sign(float n);
 };
 
 #endif //OPENGLENGINE_GLMATH_H
