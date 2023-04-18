@@ -19,7 +19,7 @@ export class Camera extends EmptyObject{
     }
 
     get copy(){
-        let newCopy = new Camera(this.fov, this.aspect, this.fov, this.far);
+        let newCopy = new Camera(this.fov, this.aspect, this.near, this.far);
         newCopy.transform = this.transform.copy;
         return newCopy;
     }

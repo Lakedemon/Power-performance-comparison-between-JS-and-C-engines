@@ -61,7 +61,7 @@ export class Vector4 {
         const mag = (a.magnitude * b.magnitude);
         if (mag < glMath.EPSILON) return 0;
 
-        return Math.acos(Vector4.dot(a, b) / (a.magnitude * b.magnitude));
+        return Math.acos(Vector4.dot(a, b) / mag);
     }
 
     /**
@@ -123,6 +123,7 @@ export class Vector4 {
         this.y += v.y;
         this.z += v.z;
         this.w += v.w;
+        return this;
     }
 
     /**
@@ -134,6 +135,7 @@ export class Vector4 {
         this.y -= v.y;
         this.z -= v.z;
         this.w -= v.w;
+        return this;
     }
 
     /**
@@ -145,6 +147,7 @@ export class Vector4 {
         this.y *= v.y;
         this.z *= v.z;
         this.w *= v.w;
+        return this;
     }
 
     /**

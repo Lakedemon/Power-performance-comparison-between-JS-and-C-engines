@@ -1,6 +1,5 @@
 import {Engine} from "./Engine.js";
-import {PBRShader, basicShader} from "../GL Helpers/ShaderHandler.js";
-import {loadObject} from "../GL Helpers/AssetLoader.js";
+import {PBRShader} from "../GL Helpers/ShaderHandler.js";
 import {loadGLTF} from "../GL Helpers/AssetLoader.js";
 import {FirstPersonController} from "./FirstPersonController.js";
 import {SceneGraph} from "./SceneGraph.js";
@@ -13,7 +12,7 @@ window.onload = async function () {
     const nonEuclideanParadise = new Engine(PBRShader, scene);
     nonEuclideanParadise.start();
 
-    let player = new FirstPersonController(nonEuclideanParadise.activeScene.mainCamera.transform);
+    let player = new FirstPersonController(nonEuclideanParadise.activeScene.mainCamera.transform, 0.015);
     window.addEventListener(nonEuclideanParadise.update.type, () => player.move());
 }
 

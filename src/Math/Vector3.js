@@ -88,7 +88,7 @@ export class Vector3 {
         const mag = (a.magnitude * b.magnitude);
         if (mag < glMath.EPSILON) return 0;
 
-        return Math.acos(Vector3.dot(a, b) / (a.magnitude * b.magnitude));
+        return Math.acos(Vector3.dot(a, b) / mag);
     }
 
     /**

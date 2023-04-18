@@ -1,10 +1,11 @@
 import {Object3D} from "./Object3D.js";
 import {Mesh} from "./Mesh.js";
-import {glMath, Matrix4, Vector3, Vector4} from "../Math/index.js";
+import {glMath, Vector3} from "../Math/index.js";
 import {pbrMetallicRoughness} from "./Material.js";
 import {Camera} from "./Camera.js";
 import {PointLight} from "./PointLight.js";
 import {maxLightCount} from "../GL Helpers/ShaderSource.js";
+import {Sampler, Channel, Animator} from "./Animator.js";
 
 export class SceneGraph{
     mainCamera;
@@ -16,6 +17,7 @@ export class SceneGraph{
 
     meshes = {};
     materials = {};
+    animations = [];
 
     constructor(shader) {
         this.shader = shader;
@@ -39,6 +41,10 @@ export class SceneGraph{
         gl.uniform3fv(this.shader.uniforms.lightColors, new Float32Array(color));
     }
 
+    animate(t){
+        this.animations.forEach(animation => animation.animate(t));
+    }
+
     updateScene(clearColor = [0.2, 0.5, 0.3, 1]) {
         gl.clearColor(...clearColor);
         gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -50,7 +56,6 @@ export class SceneGraph{
     portalDraw() {
         //for all portals evaluating on which side of the portal an observer is
         const newSides = this.portalLinks.map(link => Vector3.side(link.master.transform.position, this.mainCamera.transform.position, link.master.transform.back));
-
         //handling teleportation
         for(let i = 0; i < this.portalLinks.length; i++){
             const {master, link, side} = this.portalLinks[i];
@@ -62,12 +67,14 @@ export class SceneGraph{
                 this.portalLinks[i].side = newSide;
             } else if(newSide !== side && collide){
                 this.mainCamera.relativeMirror(master.worldMatrix, link.worldMatrix).inverse.toTransform(this.mainCamera.transform);
-                this.portalLinks = this.portalLinks.map(link => {link.side = Vector3.side(link.master.transform.position, this.mainCamera.transform.position, link.master.transform.back); return link});
+                this.portalLinks = this.portalLinks.map(link => {
+                    link.side = Vector3.side(link.master.transform.position, this.mainCamera.transform.position, link.master.transform.back);
+                    return link
+                });
             }
 
             this.portalLinks[i].side = newSide;
         }
-
         //drawing the insides of the portal(the stencil part)
         for (const {master, link, side} of this.portalLinks) {
             //drawing frame into stencil
@@ -82,7 +89,7 @@ export class SceneGraph{
 
             master.drawObject();
 
-            //drawing scene inside of the portal
+            //drawing scene inside the portal
             gl.colorMask(true,true,true, true);
             gl.depthMask(true);
 
@@ -142,13 +149,12 @@ export class SceneGraph{
             const {POSITION, NORMAL, TEXCOORD_0} = primitive.attributes;
 
             scene.meshes[mesh.name] = new Mesh(
-                daraFromAccessor(POSITION),
-                daraFromAccessor(NORMAL),
-                daraFromAccessor(TEXCOORD_0),
-                daraFromAccessor(primitive.indices)
+                dataFromAccessor(POSITION),
+                dataFromAccessor(NORMAL),
+                dataFromAccessor(TEXCOORD_0),
+                dataFromAccessor(primitive.indices)
             );
         });
-
 
         gltf.nodes.forEach(node => {
             let parsedNode;
@@ -180,6 +186,38 @@ export class SceneGraph{
             setNodeTransforms(node, parsedNode);
         });
 
+
+        if(gltf.hasOwnProperty("animations")) {
+            gltf.animations.forEach(animation => {
+                let channels = [];
+
+                animation.channels.forEach(channel => {
+                    let samplerData = animation.samplers[channel.sampler];
+                    let targetPath = channel.target.path;
+                    let interpolation = Sampler.interpolationModes[targetPath === "rotation" ? "rotation" : samplerData.interpolation];
+                    let sampler = new Sampler(dataFromAccessor(samplerData.input), dataFromAccessor(samplerData.output), Mesh.typeCount[gltf.accessors[samplerData.output].type], interpolation);
+                    channels.push(new Channel(getNodeFromNIndex(channel.target.node), Channel.paths[targetPath], sampler));
+                });
+                scene.animations.push(new Animator(channels));
+            });
+        }
+        /*
+        * This is a work around a problem in the design,
+        * where GLTF stores nodes together in one group,
+        * contradictory to separate storage in the current implementation
+        * */
+        function getNodeFromNIndex(index){
+            let node = gltf.nodes[index];
+            if(node.hasOwnProperty("mesh")) {
+                return scene.objects[node.name];
+            } else if(node.hasOwnProperty("camera")){
+                return scene.mainCamera;
+            } else if(node.hasOwnProperty("extensions")){
+                return scene.lights[node.name];
+            }
+            return null;
+        }
+
         function setNodeTransforms(node, obj){
             if (node.hasOwnProperty("translation")) {
                 obj.setPosition(new Vector3(...node.translation));
@@ -192,7 +230,7 @@ export class SceneGraph{
             }
         }
 
-        function daraFromAccessor(accessorIndex){
+        function dataFromAccessor(accessorIndex){
             const accessor = gltf.accessors[accessorIndex];
             const {buffer, byteLength, byteOffset} = gltf.bufferViews[accessor.bufferView];
 
@@ -209,7 +247,6 @@ export class SceneGraph{
         });
 
         scene.setLights();
-
         return scene;
     }
 }

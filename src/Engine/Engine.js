@@ -2,6 +2,7 @@ import {SceneGraph} from "./SceneGraph.js";
 
 export class Engine {
     #timer = 0;
+    #startTime;
     activeScene;
 
     constructor(mainShader, scene) {
@@ -10,6 +11,7 @@ export class Engine {
 
         this.activeScene = scene ?? new SceneGraph(mainShader);
         this.update = new Event("update");
+        this.#startTime = Date.now();
     }
 
     start() {
@@ -20,6 +22,7 @@ export class Engine {
         this.#resizeCanvas();
 
         this.#updateTime();
+        this.activeScene.animate(this.#timer / 1000);
         this.activeScene.updateScene();
         this.activeScene.portalDraw();
 
@@ -35,10 +38,7 @@ export class Engine {
     }
 
     #updateTime() {
-        let now = Date.now();
-        window.deltaTime = this.#timer - now;
-        this.#timer += deltaTime;
+        this.#timer = Date.now() - this.#startTime;
     }
 }
-
 

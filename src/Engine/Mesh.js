@@ -1,4 +1,5 @@
-import {Vector2, Vector3} from "../Math/index.js";
+import {Vector3} from "../Math/index.js";
+import {defaultAttributeLocations} from "../GL Helpers/ShaderSource.js";
 
 export class Mesh {
     static typeCount = Object.freeze({
@@ -12,12 +13,14 @@ export class Mesh {
     #NORMAL;
     #TEXCOORD_0;
     #index;
+    #vao;
 
     constructor(position, normal, texcoord_0, index) {
         this.#POSITION = Mesh.#ifArrayTypedArray(position);
         this.#NORMAL = Mesh.#ifArrayTypedArray(normal);
         this.#TEXCOORD_0 = Mesh.#ifArrayTypedArray(texcoord_0);
         this.#index = Mesh.#ifArrayTypedArray(index, Uint16Array);
+        this.createBufferedState(defaultAttributeLocations);
     }
 
     get useIndex() {
@@ -36,7 +39,6 @@ export class Mesh {
         function everyNthElement(arr, n, offset) {
             return arr.filter((_, index) => (index - offset) % n === 0);
         }
-
 
         const sortedCoordinates = [0, 1, 2].map(offset => everyNthElement(this.#POSITION, 3, offset));
         const minMax = sortedCoordinates.map(arr => ([Math.min(...arr),  Math.max(...arr)]));
@@ -64,15 +66,19 @@ export class Mesh {
         gl.vertexAttribPointer(location, dataType, gl.FLOAT, false, 0, 0);
     }
 
-    getBufferedState(locations) {
-        const vao = gl.createVertexArray();
-        gl.bindVertexArray(vao);
+    getBufferedState(){
+        return this.#vao;
+    }
+
+    createBufferedState(locations) {
+        this.#vao = gl.createVertexArray();
+        gl.bindVertexArray(this.#vao);
 
         Mesh.#bufferData(this.#POSITION, Mesh.typeCount.VEC3, locations.POSITION);
         Mesh.#bufferData(this.#NORMAL, Mesh.typeCount.VEC3, locations.NORMAL);
         Mesh.#bufferData(this.#TEXCOORD_0, Mesh.typeCount.VEC2, locations.TEXCOORD_0);
         Mesh.#bufferData(this.#index, Mesh.typeCount.SCALAR, undefined, gl.ELEMENT_ARRAY_BUFFER);
-        return vao;
+        return this.#vao;
     }
 
     static #ifArrayTypedArray(data, arrayType = Float32Array) {

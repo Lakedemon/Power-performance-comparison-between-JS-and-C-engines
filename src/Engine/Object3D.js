@@ -1,5 +1,4 @@
 import {EmptyObject} from "./EmptyObject.js";
-import {defaultAttributeLocations} from "../GL Helpers/ShaderSource.js";
 import {pbrMetallicRoughness} from "./Material.js";
 
 export class Object3D extends EmptyObject{
@@ -20,7 +19,7 @@ export class Object3D extends EmptyObject{
         this.#shader = shader;
         this.material = material ?? pbrMetallicRoughness.defaultMaterial();
 
-        this.#vao = mesh.getBufferedState(defaultAttributeLocations);
+        this.#vao = mesh.getBufferedState();
         this.tag = Object.values(Object3D.objectTags).includes(tag) ? tag : Object3D.objectTags.Default;
     }
 

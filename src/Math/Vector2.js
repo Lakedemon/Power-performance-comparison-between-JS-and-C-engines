@@ -88,7 +88,7 @@ export class Vector2 {
      * @returns {number} cross product of a and d
      */
     static cross(a, b) {
-        return new Vector2(a.x * b.y - a.y * b.x);
+        return a.x * b.y - a.y * b.x;
     }
 
     /**

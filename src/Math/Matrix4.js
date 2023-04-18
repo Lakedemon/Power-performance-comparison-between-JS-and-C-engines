@@ -1,5 +1,4 @@
 import {Vector3} from "./Vector3.js";
-import {glMath} from "./glMath.js";
 import {Vector4} from "./Vector4.js";
 
 /**
@@ -114,30 +113,6 @@ export class Matrix4 {
             this.entries[n + 12],
         );
     }
-
-    /*get left() {
-        return new Vector3(this.entries[0], this.entries[1], this.entries[2]);
-    }
-
-    get up() {
-        return new Vector3(this.entries[4], this.entries[5], this.entries[6]);
-    }
-
-    get forward() {
-        return new Vector3(this.entries[8], this.entries[9], this.entries[10]);
-    }
-
-    get right() {
-        return new Vector3(-this.entries[0], -this.entries[1], -this.entries[2]);
-    }
-
-    get down() {
-        return new Vector3(-this.entries[4], -this.entries[5], -this.entries[6]);
-    }
-
-    get back() {
-        return new Vector3(-this.entries[8], -this.entries[9], -this.entries[10]);
-    }*/
 
     static identity() {
         return new Matrix4([1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1]);
@@ -467,7 +442,7 @@ export class Matrix4 {
     multiplyPoint(v)
     {
         const [m00, m01, m02, m03, m10, m11, m12, m13, m20, m21, m22, m23, m30, m31, m32, m33] = this.entries;
-        const  num = 1 / (m03 *  v.x +  m13 *  v.y +  m23 *  v.z + m33);
+        const num = 1 / (m03 *  v.x +  m13 *  v.y +  m23 *  v.z + m33);
 
         return new Vector3(
             (m00 *  v.x +  m10 *  v.y +  m20 *  v.z + m30) * num,

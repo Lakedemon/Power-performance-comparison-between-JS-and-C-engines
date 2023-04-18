@@ -1,4 +1,4 @@
-import {glMath, Matrix4, Vector2, Vector3} from "../Math/index.js";
+import {glMath, Vector3} from "../Math/index.js";
 
 export class FirstPersonController{
     // Flipped when controlling camera, because camera matrix is then inverted to make a view matrix
@@ -19,7 +19,7 @@ export class FirstPersonController{
     #triggers;
     #limits;
 
-    constructor(transform, controlScheme, limits, moveSpeed = 0.015, turnSpeed = 0.005) {
+    constructor(transform, moveSpeed = 0.015, turnSpeed = 0.005, controlScheme, limits) {
         this.#controlledTransform = transform;
         this.#controlScheme = controlScheme ?? FirstPersonController.wasdControls;
         this.#limits = limits ?? FirstPersonController.defaultTurnLimits;
