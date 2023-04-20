@@ -18,4 +18,5 @@ def run():
     server.serve_forever()
 
 threading.Thread(target=run).start()
-webbrowser.open('http://localhost:{PORT}/src/a_landing/LandingPage.html'.format(PORT=PORT))
+#webbrowser.open('http://localhost:{PORT}/src/a_landing/LandingPage.html'.format(PORT=PORT))
+webbrowser.open('http://localhost:{PORT}/src/a_demo/Stranichka.html'.format(PORT=PORT))

@@ -6,7 +6,7 @@ import {SceneGraph} from "./SceneGraph.js";
 
 window.onload = async function () {
     console.log(sessionStorage.getItem("pathToDemo"));
-    let data = await loadGLTF(sessionStorage.getItem("pathToDemo") || "gl_separate");
+    let data = await loadGLTF(sessionStorage.getItem("pathToDemo") || "Scenario1");
     let scene = SceneGraph.fromGLTF(data, PBRShader);
 
     const nonEuclideanParadise = new Engine(PBRShader, scene);
