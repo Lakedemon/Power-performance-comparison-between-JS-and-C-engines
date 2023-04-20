@@ -7,18 +7,19 @@ Bachelor project focused on comparing efficiency of 3D engines based on their pr
 Get libraries and tools(cmake, g++ compiler, package manager and OpenGL dependecies):
 
 ```sh
-apt-get update
-apt-get install cmake pkg-config build-essential libglew-dev libglfw3-dev libglm-dev libao-dev libmpg123-dev libxinerama-dev libxcursor-dev libxi-dev
+sudo apt-get update
+sudo apt-get install cmake pkg-config build-essential libglew-dev libglfw3-dev libglm-dev libao-dev libmpg123-dev libxinerama-dev libxcursor-dev libxi-dev
 ```
 
 Get open source OpenGL implementation(GLFW) and configure the cmake:
 
 ```sh
 cd /usr/local/lib/
-git clone https://github.com/glfw/glfw.git
-cmake .
-make
-make install
+sudo git clone https://github.com/glfw/glfw.git
+cd glfw
+sudo cmake .
+sudo make
+sudo make install
 ```
 
 Get GLAD configuration from https://glad.dav1d.de/#profile=compatibility&language=c&specification=gl&loader=on&api=gl%3D4.6() and add it to the include folder:

@@ -12,7 +12,7 @@
 
 class SceneGraph {
 private:
-    Camera mainCamera;
+    const char *mainCameraName;
     Shader _shader;
 
     struct unprocessedPortalLink{
@@ -43,14 +43,14 @@ private:
     std::map<const char*, PointLight, cmp_str> lights;
     std::map<const char*, Mesh, cmp_str> meshes;
     std::map<const char*, PBRMetallicRoughness, cmp_str> materials;
+    std::map<const char*, Camera, cmp_str> cameras;
+    Camera& mainCamera();
 
     template<typename T>
     std::vector<T> dataFromAccessor(std::vector<T> value, std::ifstream &inFile, unsigned int byteLength, unsigned int byteOffset);
-
-    void setMainCamera(Camera& camera);
+    void setMainCamera(const char* name);
     void updateActiveCamera(Camera& camera);
     void updateActiveCamera(Matrix4 &projection, Matrix4 view, Vector3 &position);
-
     void setLights();
 public:
     explicit SceneGraph(Shader &shader);

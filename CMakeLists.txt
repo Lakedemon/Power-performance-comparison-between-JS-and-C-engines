@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.22)
 project(OpenGLEngine)
 
 find_package(PkgConfig REQUIRED)
+pkg_check_modules(JSONCPP jsoncpp)
 pkg_search_module(GLFW REQUIRED glfw3)
 link_libraries(${JSONCPP_LIBRARIES})
 find_package(GLEW REQUIRED)
@@ -16,4 +17,4 @@ add_executable(OpenGLEngine glad.c hello_triangle.cpp)
 ]]
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${GLFW_INCLUDE_DIRS})
-target_link_libraries(${PROJECT_NAME} PRIVATE GLEW::GLEW ${GLFW_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} PUBLIC ${JSONCPP_LIBRARIES} PRIVATE GLEW::GLEW ${GLFW_LIBRARIES})

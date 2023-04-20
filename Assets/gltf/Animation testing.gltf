@@ -128,6 +128,37 @@
                     "output" : 10
                 }
             ]
+        },
+        {
+            "channels" : [
+                {
+                    "sampler" : 0,
+                    "target" : {
+                        "node" : 2,
+                        "path" : "translation"
+                    }
+                },
+                {
+                    "sampler" : 1,
+                    "target" : {
+                        "node" : 2,
+                        "path" : "rotation"
+                    }
+                }
+            ],
+            "name" : "CameraAction",
+            "samplers" : [
+                {
+                    "input" : 8,
+                    "interpolation" : "LINEAR",
+                    "output" : 11
+                },
+                {
+                    "input" : 8,
+                    "interpolation" : "LINEAR",
+                    "output" : 12
+                }
+            ]
         }
     ],
     "materials" : [
@@ -267,6 +298,18 @@
             "componentType" : 5126,
             "count" : 181,
             "type" : "VEC4"
+        },
+        {
+            "bufferView" : 11,
+            "componentType" : 5126,
+            "count" : 181,
+            "type" : "VEC3"
+        },
+        {
+            "bufferView" : 12,
+            "componentType" : 5126,
+            "count" : 181,
+            "type" : "VEC4"
         }
     ],
     "bufferViews" : [
@@ -332,11 +375,21 @@
             "buffer" : 0,
             "byteLength" : 2896,
             "byteOffset" : 3876
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 2172,
+            "byteOffset" : 6772
+        },
+        {
+            "buffer" : 0,
+            "byteLength" : 2896,
+            "byteOffset" : 8944
         }
     ],
     "buffers" : [
         {
-            "byteLength" : 6772,
+            "byteLength" : 11840,
             "uri" : "Animation testing.bin"
         }
     ]

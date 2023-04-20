@@ -25,7 +25,6 @@ Vector3 Sampler::getOutput(float globalT) {
     } else if (this->_mode == "STEP"){
         return getVector3(_output, index);
     } else if (this->_mode == "rotation"){
-        auto test_a = slerp(getVector4(_output, index), getVector4(_output, index), t);
         return slerp(getVector4(_output, index), getVector4(_output, index), t);
     } else {
         std::cout << "ERROR:SAMPLER:INTERPOLATION_MODE_NOT_SUPPORTED" << std::endl;

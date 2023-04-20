@@ -1,6 +1,7 @@
 #include "SceneGraph.h"
 
 SceneGraph::SceneGraph(Shader &shader) : _shader(shader) {
+    mainCameraName = "";
     glUseProgram(shader.getId());
 }
 
@@ -39,12 +40,12 @@ SceneGraph::SceneGraph(Json::Value gltf, Shader &shader) : SceneGraph(shader){
         if(node.isMember("mesh")) {
             return this->objects.at(node["name"].asCString());
         } else if(node.isMember("camera")){
-            return this->mainCamera;
+            return this->mainCamera();
         } else if(node.isMember("extensions")){
             return this->lights.at(node["name"].asCString());
         }
         std::cout << "ERROR::GLTF::NODE_NOT_FOUND";
-        return this->mainCamera;
+        return this->mainCamera();
     };
 
     for(Json::Value& material : gltf["materials"]){
@@ -67,10 +68,10 @@ SceneGraph::SceneGraph(Json::Value gltf, Shader &shader) : SceneGraph(shader){
         std::vector<uint16_t> index;
 
         this->meshes[mesh["name"].asCString()] = Mesh{
-                dataFromAccessor<float>(pos, buffers.at(std::get<0>(posArgs)), std::get<1>(posArgs),std::get<2>(posArgs)),
-                dataFromAccessor<float>(norm, buffers.at(std::get<0>(normArgs)), std::get<1>(normArgs), std::get<2>(normArgs)),
-                dataFromAccessor<float>(tex, buffers.at(std::get<0>(texArgs)), std::get<1>(texArgs), std::get<2>(texArgs)),
-                dataFromAccessor<uint16_t>(index, buffers.at(std::get<0>(indexArgs)), std::get<1>(indexArgs), std::get<2>(indexArgs)),
+            dataFromAccessor<float>(pos, buffers.at(std::get<0>(posArgs)), std::get<1>(posArgs),std::get<2>(posArgs)),
+            dataFromAccessor<float>(norm, buffers.at(std::get<0>(normArgs)), std::get<1>(normArgs), std::get<2>(normArgs)),
+            dataFromAccessor<float>(tex, buffers.at(std::get<0>(texArgs)), std::get<1>(texArgs), std::get<2>(texArgs)),
+            dataFromAccessor<uint16_t>(index, buffers.at(std::get<0>(indexArgs)), std::get<1>(indexArgs), std::get<2>(indexArgs)),
         };
     }
 
@@ -99,12 +100,11 @@ SceneGraph::SceneGraph(Json::Value gltf, Shader &shader) : SceneGraph(shader){
             Json::Value& camData = gltf["cameras"][node["camera"].asUInt()]["perspective"];
 
             float const fov = glMath::toDeg(glMath::toYFOV(camData["yfov"].asFloat(), camData["aspectRatio"].asFloat()));
-            Camera cam = Camera{fov, Config::aspect, camData["znear"].asFloat(), camData["zfar"].asFloat()};
-            setNodeTransforms(node, cam);
-            setMainCamera(cam);
+            this->cameras.emplace(name, Camera{fov, Config::aspect, camData["znear"].asFloat(), camData["zfar"].asFloat()});
+            setMainCamera(name);
+            setNodeTransforms(node, this->mainCamera());
         } else if (node.isMember("extensions") && node["extensions"].isMember("KHR_lights_punctual") && this->lights.size() < Config::maxLightsCount){
             Json::Value& lightData = gltf["extensions"]["KHR_lights_punctual"]["lights"][node["extensions"]["KHR_lights_punctual"]["light"].asUInt()];
-            auto a = PointLight{parseVector3(lightData["color"]), glMath::toPower(lightData["intensity"].asFloat())};
 
             this->lights.emplace(name, PointLight{parseVector3(lightData["color"]), glMath::toPower(lightData["intensity"].asFloat())});
             setNodeTransforms(node, this->lights.at(name));
@@ -151,7 +151,7 @@ void SceneGraph::portalDraw() {
     unsigned int linksCount = portalLinks.size();
     int newSides[linksCount];
     for (int i = 0; i < linksCount; ++i) {
-        newSides[i] = Vector3::side(portalLinks[i].master.transform.position, mainCamera.transform.position, portalLinks[i].master.transform.back());
+        newSides[i] = Vector3::side(portalLinks[i].master.transform.position, this->mainCamera().transform.position, portalLinks[i].master.transform.back());
     }
 
     //handling teleportation
@@ -160,14 +160,16 @@ void SceneGraph::portalDraw() {
         const int newSide = newSides[i];
 
         Vector3 v = {1, 0, 1};
-        const bool collide = Vector3::distance(master.transform.position, mainCamera.transform.position) < master.mesh.boundingRadius(v);
+        const bool collide = Vector3::distance(master.transform.position, this->mainCamera().transform.position) < master.mesh.boundingRadius(v);
 
         if(side == 0){
             portalLinks[i].side = newSide;
         } else if(newSide != side && collide) {
-            mainCamera.transform.copy(Transform(mainCamera.relativeMirror(master.worldMatrix(), link.worldMatrix()).inverse()));
+            //not relevant
+            Transform newT = Transform(this->mainCamera().relativeMirror(master.worldMatrix(), link.worldMatrix()).inverse());
+            this->mainCamera().transform.copy(this->mainCamera().transform);
             for (PortalLink& newLink: portalLinks) {
-                newLink.side = Vector3::side(newLink.master.transform.position, mainCamera.transform.position,newLink.master.transform.back());
+                newLink.side = Vector3::side(newLink.master.transform.position, this->mainCamera().transform.position,newLink.master.transform.back());
             }
         }
         portalLinks[i].side = newSide;
@@ -196,9 +198,9 @@ void SceneGraph::portalDraw() {
         glStencilMask(0x00);
         glStencilFunc(GL_EQUAL, 1, 0xff);
 
-        Matrix4 rm = mainCamera.relativeMirror(master.worldMatrix(), link.worldMatrix());
-        Matrix4 proj = Matrix4{mainCamera.projectionMatrix};
-        proj.clipProjectionMatrix(Camera::clippingPlane(master.transform, mainCamera.viewMat(), side));
+        Matrix4 rm = this->mainCamera().relativeMirror(master.worldMatrix(), link.worldMatrix());
+        Matrix4 proj = Matrix4{this->mainCamera().projectionMatrix};
+        proj.clipProjectionMatrix(Camera::clippingPlane(master.transform, this->mainCamera().viewMat(), side));
 
         glUniformMatrix4fv(glGetUniformLocation(_shader.getId(), "u_projection"), 1, GL_FALSE, proj.entries);
         glUniformMatrix4fv(glGetUniformLocation(_shader.getId(), "u_view"), 1, GL_FALSE, rm.entries);
@@ -207,7 +209,7 @@ void SceneGraph::portalDraw() {
         defaultDraw(portalExceptionTags);
 
         //resetting stencil test to separate stencils of every portal
-        updateActiveCamera(mainCamera);
+        updateActiveCamera(this->mainCamera());
 
         glColorMask(false, false, false, false);
         glDepthMask(false);
@@ -242,9 +244,9 @@ void SceneGraph::defaultDraw(std::vector<enum Object3D::Tags> exceptionTags) {
     }
 }
 
-void SceneGraph::setMainCamera(Camera& camera) {
-    this->mainCamera = camera;
-    updateActiveCamera(camera);
+void SceneGraph::setMainCamera(const char* name) {
+    this->mainCameraName = name;
+    updateActiveCamera(this->cameras.at(name));
 }
 
 void SceneGraph::animate(float t) {
@@ -258,7 +260,7 @@ void SceneGraph::updateScene(Vector4 clearColor) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glEnable(GL_DEPTH_TEST);
-    this->updateActiveCamera(mainCamera);
+    this->updateActiveCamera(this->mainCamera());
 }
 
 void SceneGraph::updateActiveCamera(Camera &camera) {
@@ -300,6 +302,10 @@ void SceneGraph::setLights() {
 
     glUniform3fv(glGetUniformLocation(_shader.getId(), "u_lightPositions"), len, pos);
     glUniform3fv(glGetUniformLocation(_shader.getId(), "u_lightColors"), len, color);
+}
+
+Camera &SceneGraph::mainCamera() {
+    return this->cameras.at(mainCameraName);
 }
 
 template<typename T>

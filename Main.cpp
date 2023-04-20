@@ -4,6 +4,6 @@
 int main()
 {
     GLFWwindow* window= Engine::initGLFW(Config::screenWidth, Config::screenHeight);
-    Engine engine = Engine(window, "PBR_VS.glsl", "PBR_FS.glsl", "ShapeMuseum.gltf");
+    Engine engine = Engine(window, Config::defaultVS, Config::defaultFS, Config::defaultGLTF);
     engine.start();
 }

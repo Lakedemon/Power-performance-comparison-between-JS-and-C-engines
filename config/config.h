@@ -12,6 +12,10 @@ namespace Config {
     static const std::string gltfPath("../Assets/gltf/");
     static const std::string assetPath("../Assets/");
 
+    static const std::string defaultVS("PBR_VS.glsl");
+    static const std::string defaultFS("PBR_FS.glsl");
+    static const std::string defaultGLTF("Scenario1.gltf");
+
     static const int screenWidth = 1920;
     static const int screenHeight = 1080;
     static const float aspect = 1.77777777778;
