@@ -4,6 +4,6 @@
 int main()
 {
     GLFWwindow* window= Engine::initGLFW(Config::screenWidth, Config::screenHeight);
-    Engine engine = Engine(window, Config::defaultVS, Config::defaultFS, Config::defaultGLTF);
+    Engine engine = Engine(window, Config::defaultVS, Config::defaultFS, Config::defaultGLTF, Config::framesToRenderBeforeKill);
     engine.start();
 }

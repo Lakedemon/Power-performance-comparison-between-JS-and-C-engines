@@ -1,7 +1,7 @@
 #include "Engine.h"
 
 void Engine::renderLoop() {
-    while (!glfwWindowShouldClose(window)) {
+    while (!(glfwWindowShouldClose(window) || framesElapsed >= runForNFrames && runForNFrames >= 0)) {
         processInput(window);
 
         this->updateTime();
@@ -11,14 +11,19 @@ void Engine::renderLoop() {
 
         glfwSwapBuffers(window);
         glfwPollEvents();
+
+        framesElapsed++;
+        std::cout << framesElapsed << std::endl;
     }
+
+    glfwTerminate();
 }
 
 void Engine::start() {
     this->renderLoop();
 }
 
-Engine::Engine(GLFWwindow* window, const std::string& vsName, const std::string& fsName, const std::string& gltfName): window(window) {
+Engine::Engine(GLFWwindow* window, const std::string& vsName, const std::string& fsName, const std::string& gltfName, int runForNFrames = 0): window(window), runForNFrames(runForNFrames) {
     startTime = std::chrono::steady_clock::now();
     Shader mainShader = Shader{vsName, fsName};
     this->activeScene = SceneGraph{AssetLoader::loadJSON(gltfName), mainShader};
@@ -39,8 +44,8 @@ GLFWwindow *Engine::initGLFW(int screenWidth, int screenHeight) {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
 
-    glfwSwapInterval(1);
     GLFWwindow* window = glfwCreateWindow(screenWidth, screenHeight, "OpenGLEngine", nullptr, nullptr);
     if (window == nullptr)
     {
@@ -48,6 +53,7 @@ GLFWwindow *Engine::initGLFW(int screenWidth, int screenHeight) {
         glfwTerminate();
     }
     glfwMakeContextCurrent(window);
+    glfwSwapInterval(Config::glfwSwapInterval);
     glfwSetFramebufferSizeCallback(window, resizeWindow);
 
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress))
