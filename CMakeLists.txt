@@ -17,5 +17,7 @@ add_executable(OpenGLEngine glad.c GL_Helpers/AssetLoader.cpp GL_Helpers/AssetLo
 add_executable(OpenGLEngine glad.c hello_triangle.cpp)
 ]]
 
-target_include_directories(${PROJECT_NAME} PRIVATE ${GLFW_INCLUDE_DIRS})
-target_link_libraries(${PROJECT_NAME} PUBLIC ${JSONCPP_LIBRARIES} PRIVATE GLEW::GLEW ${GLFW_LIBRARIES})
+target_include_directories(${PROJECT_NAME} PUBLIC ${GLFW_INCLUDE_DIRS})
+
+#target_link_libraries(${PROJECT_NAME} PUBLIC ${JSONCPP_LIBRARIES} PRIVATE GLEW::GLEW ${GLFW_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} PUBLIC ${JSONCPP_LIBRARIES} PRIVATE glfw3 GL X11 pthread Xrandr Xi dl)
