@@ -4,14 +4,16 @@ export class Engine {
     #timer = 0;
     #startTime;
     activeScene;
+    #framesElapsed = 0;
 
-    constructor(mainShader, scene) {
+    constructor(mainShader, scene, runForNFrames = 0) {
         window.gl = canvas.getContext("webgl2", {stencil:true});
         gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
         this.activeScene = scene ?? new SceneGraph(mainShader);
         this.update = new Event("update");
         this.#startTime = Date.now();
+        this.runForNFrames = runForNFrames;
     }
 
     start() {
@@ -26,6 +28,7 @@ export class Engine {
         this.activeScene.updateScene();
         this.activeScene.portalDraw();
 
+        this.#updateFrameCount();
         window.requestAnimationFrame(this.#renderLoop.bind(this));
         window.dispatchEvent(this.update);
     }
@@ -39,6 +42,29 @@ export class Engine {
 
     #updateTime() {
         this.#timer = Date.now() - this.#startTime;
+    }
+
+    #updateFrameCount(){
+        this.#framesElapsed += 1;
+        console.log(this.#framesElapsed);
+        if(this.#framesElapsed >= this.runForNFrames && this.runForNFrames !== 0){
+            this.#shutdownServer();
+        }
+    }
+
+     #shutdownServer() {
+        fetch('http://localhost:8000/shutdown')
+            .then(response => {
+                if (response.ok) {
+                    console.log('Server shutdown successful.');
+                    window.close();
+                } else {
+                    console.error('Server shutdown failed.');
+                }
+            })
+            .catch(error => {
+                console.error('Error sending shutdown request:', error);
+            });
     }
 }
 

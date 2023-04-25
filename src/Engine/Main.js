@@ -6,10 +6,10 @@ import {SceneGraph} from "./SceneGraph.js";
 
 window.onload = async function () {
     console.log(sessionStorage.getItem("pathToDemo"));
-    let data = await loadGLTF(sessionStorage.getItem("pathToDemo") || "Scenario1");
+    let data = await loadGLTF(sessionStorage.getItem("pathToDemo") || "Scenario2");
     let scene = SceneGraph.fromGLTF(data, PBRShader);
 
-    const nonEuclideanParadise = new Engine(PBRShader, scene);
+    const nonEuclideanParadise = new Engine(PBRShader, scene, 1440);
     nonEuclideanParadise.start();
 
     let player = new FirstPersonController(nonEuclideanParadise.activeScene.mainCamera.transform, 0.015);
