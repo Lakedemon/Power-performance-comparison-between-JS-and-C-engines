@@ -3,14 +3,16 @@ import webbrowser
 import threading
 import os.path
 
-
 PORT = 8000
+RequestScene = "Scenario1"
+
 ChromePath = "/usr/bin/google-chrome-stable"
 ChromeFlags = "--disable-gpu-vsync --disable-frame-rate-limit"
 
 class CORSRequestHandler(SimpleHTTPRequestHandler):
     def end_headers(self):
     	#Allow CORS(cross-origin)
+        self.send_header('Set-Cookie', 'pathToDemo=' + RequestScene)
         self.send_header('Access-Control-Allow-Origin', '*')
         self.send_header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS')
         self.send_header('Access-Control-Allow-Headers', 'Content-Type')
