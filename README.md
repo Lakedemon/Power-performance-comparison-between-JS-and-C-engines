@@ -46,7 +46,7 @@ g++ hello_triangle.cpp glad.c -ldl -lglfw
 Compile the repository:
 ```shell
 mkdir ./Build
-sudo cmake -S ./ -B ./Build
+cmake -S ./ -B ./Build
 cd ./Build
 make
 ```
