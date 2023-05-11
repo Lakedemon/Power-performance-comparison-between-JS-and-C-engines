@@ -2,12 +2,18 @@ from http.server import HTTPServer, SimpleHTTPRequestHandler
 import webbrowser
 import threading
 import os.path
+import argparse
 
-PORT = 8000
-RequestScene = "Scenario1"
+parser = argparse.ArgumentParser()
+parser.add_argument('--scenario', type=str, help="string name of gltf scene to be launched")
+args = parser.parse_args()
+
+RequestScene = args.scenario
 
 ChromePath = "/usr/bin/google-chrome-stable"
-ChromeFlags = "--disable-gpu-vsync --disable-frame-rate-limit"
+ChromeFlags = "--disable-gpu-vsync --disable-frame-rate-limit --window-size=1920,1080"
+
+PORT = 8000
 
 class CORSRequestHandler(SimpleHTTPRequestHandler):
     def end_headers(self):
@@ -18,9 +24,9 @@ class CORSRequestHandler(SimpleHTTPRequestHandler):
         self.send_header('Access-Control-Allow-Headers', 'Content-Type')
         
         #Disable caching
-        #self.send_header("Cache-Control", "no-cache, no-store, must-revalidate")
-        #self.send_header("Pragma", "no-cache")
-        #self.send_header("Expires", 0)
+        self.send_header("Cache-Control", "no-cache, no-store, must-revalidate")
+        self.send_header("Pragma", "no-cache")
+        self.send_header("Expires", 0)
         SimpleHTTPRequestHandler.end_headers(self)
 
     def do_GET(self):
@@ -41,4 +47,4 @@ def run():
 thr = threading.Thread(target=run, daemon=True)
 thr.start()
 
-webbrowser.get(ChromePath + " %s " + ChromeFlags).open('http://localhost:{PORT}/src/a_demo/Stranichka.html'.format(PORT=PORT))
+webbrowser.get(ChromePath + " %s " + ChromeFlags).open('http://localhost:{PORT}/src/a_demo/Stranichka.html'.format(PORT=PORT), new=1)

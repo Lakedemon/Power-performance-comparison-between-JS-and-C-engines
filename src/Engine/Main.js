@@ -5,8 +5,10 @@ import {FirstPersonController} from "./FirstPersonController.js";
 import {SceneGraph} from "./SceneGraph.js";
 
 window.onload = async function () {
-    console.log(sessionStorage.getItem("pathToDemo"));
-    let data = await loadGLTF(sessionStorage.getItem("pathToDemo") || "Scenario2");
+    let scenario = document.cookie.split("; ").find((row) => row.startsWith("pathToDemo="))?.split("=")[1] || sessionStorage.getItem("pathToDemo")
+    console.log(scenario);
+    console.log("test");
+    let data = await loadGLTF(scenario || "Scenario1");
     let scene = SceneGraph.fromGLTF(data, PBRShader);
 
     const nonEuclideanParadise = new Engine(PBRShader, scene, 1440);
