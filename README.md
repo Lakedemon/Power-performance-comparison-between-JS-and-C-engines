@@ -4,7 +4,7 @@ This repository is a part of a bachelor project completed in the University of l
 The project is focused on conducting energy and time benchmarks, comparing C++ and JavaScript in their performance in graphical applications. The project includes development of the test subjects, benchmarking environment and data analysis. The following are the components of this package:
 * JS_engine - JavaScript 3D engine.
 * C++_engine - C++ 3D engine.
-* Main - Contains the steps needed to be taken to reproduce the experiment, using provided tools.
+* Main - Contains the steps needed to be taken to reproduce the experiment, using provided tools as well as [data](experiment_results) produced in the experiment.
 
 ## C++ Engine environment setup(Linux)
 
