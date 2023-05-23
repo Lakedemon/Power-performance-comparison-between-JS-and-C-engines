@@ -7,45 +7,63 @@ data$Scenario <- factor( as.character(data$Scenario), levels=desired_order )
 data <- data[order(data$Scenario),]
 
 
-#Test normality with Kolmogorov-Smirnov test
-ks_energy_results <- lapply(grouped_by_ES_list, function(x){ ks.test(x$Energy, 'pnorm')})
-ks_time_results <- lapply(grouped_by_ES_list, function(x){ ks.test(x$Time, 'pnorm')})
 
-all_tests_successful <- all(sapply(append(ks_energy_results, ks_time_results), function(x) x$p.value > 0.05))
 
-if (all_tests_successful) {
-  cat("The data is normally distributed.")
-} else {
-  cat("The data is not normally distributed.")
+#Test normality with Shapiro–Wilk test
+library(plotly)
+library(dplyr)
+
+normality_test <- function(d, engine, variable) {
+  split_data <- split(d, d$Engine)[[engine]][,-1]
+  grouped <- split(split_data, split_data$Scenario)
+  test_results <- lapply(grouped, function(x) shapiro.test(x[[variable]]))
+  table <- data.frame(W = sapply(test_results, function(x) x$statistic), P = sapply(test_results, function(x) x$p.value))
+  table <- table %>% mutate_if(is.numeric, round, digits=3)
+  s <- unlist(lapply(row.names(table), function(x) gsub(".W", "", x)))
+  plot_ly(
+    type = "table",
+    header = list(values = c("Scenario", "W", "P")),
+    cells = list(values = rbind(s, table$W, table$P))
+  ) %>% layout(title = sprintf("%s_%s", engine, variable))
 }
+normality_test(data, "CPP", "Energy")
+normality_test(data, "JS", "Energy")
+normality_test(data, "CPP", "Time")
+normality_test(data, "JS", "Time")
+
 
 
 
 #Test significance with a two-tailed t test
-scenarios <- unique(data[,'Scenario'])
+library(plotly)
+library(dplyr)
 
-t_test_results <- list()
-for (level in scenarios) {
-  cpp_col <- paste0("CPP.", level)
-  js_col <- paste0("JS.", level)
-  
-  cpp_energy <- unlist(grouped_by_ES_list[[cpp_col]]$Energy)
-  js_energy <- unlist(grouped_by_ES_list[[js_col]]$Energy)
-  
-  cpp_time <- unlist(grouped_by_ES_list[[cpp_col]]$Time)
-  js_time <- unlist(grouped_by_ES_list[[js_col]]$Time)
-  
-  t_test_results <- append(t_test_results, list(t.test(cpp_energy, js_energy)))
-  t_test_results <- append(t_test_results, list(t.test(cpp_time, js_time)))
+significance_test <- function(d, variable, testChoice) {
+  scenarios <- unique(d[,'Scenario'])
+  test_results <- list()
+  for (level in scenarios) {
+    cpp_col <- paste0("CPP.", level)
+    js_col <- paste0("JS.", level)
+    
+    cpp <- unlist(grouped_by_ES_list[[cpp_col]][[variable]])
+    js <- unlist(grouped_by_ES_list[[js_col]][[variable]])
+    test_results <- append(test_results, list(wilcox.test(cpp, js, alternative = "two.sided")))
+  }
+  table <- data.frame(W = sapply(test_results, function(x) x$statistic), P = sapply(test_results, function(x) x$p.value))
+  #table <- table %>% mutate_if(is.numeric, round, digits=3)
+  plot_ly(
+    type = "table",
+    header = list(values = c("W", "P")),
+    cells = list(values = rbind(table$W, table$P))
+  ) %>% layout(title = sprintf("JS-CPP_%s", variable))
 }
 
-all_tests_successful <- all(sapply(t_test_results, function(x) x$p.value > 0.05))
-
-if (all_tests_successful) {
-  cat("The difference in data is significant.")
-} else {
-  cat("The difference in data is insignificant.")
-}
+# Non-normaly distributed data
+significance_test(data, "Time", "wilcox")
+significance_test(data, "Energy", "wilcox")
+# Normally distributed data
+# significance_test(data, "Time", "t")
+# significance_test(data, "Energy", "t")
 
 
 
