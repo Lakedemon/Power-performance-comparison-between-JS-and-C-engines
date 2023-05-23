@@ -129,8 +129,8 @@ Set the following parameters if you make changes in the project design:
 
 The following R [script](statistical_analysis.R) contains the following steps:
 * lines 1-7 - Loading and orginise data
-* lines 10-20 - Kollmogorov-Smirnov goodnes of fit.
-* lines 25-48 - Significance t-test.
-* lines 52-74 - Bar plot of the data.
+* lines 12-32 - Shapiro-Wilk goodnes of fit test.
+* lines 37-66 - Significance test.
+* lines 79-92 - Bar plot of the data.
 
-R script was run in the R studio. A the script is modular you can chose to only run some of the described above points, only lines 1-7 are required.
+R script was run in the RStudio. A the script is modular you can chose to only run some of the described above points, only lines 1-7 are required.
