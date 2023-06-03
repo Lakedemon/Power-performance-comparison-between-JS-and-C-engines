@@ -1,0 +1,7 @@
+cff-version: 1.2.0
+authors:
+- family-names: "Amarantos"
+  given-names: "Leonint"
+title: "Energy and time performance comparison between JavaScript and C++ engines"
+date-released: 2023-06-11
+url: "https://github.com/Lakedemon/BSP-2023-S2-Leonint-Power-performance-comparison-between-JS-and-C-engines/"
