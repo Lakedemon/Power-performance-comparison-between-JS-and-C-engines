@@ -2,9 +2,13 @@
 This repository is a part of a bachelor project completed in the University of luxembourg. 
 
 The project is focused on conducting energy and time benchmarks, comparing C++ and JavaScript in their performance in graphical applications. The project includes development of the test subjects, benchmarking environment and data analysis. The following are the components of this package:
-* JS_engine - JavaScript 3D engine.
-* C++_engine - C++ 3D engine.
-* Main - Contains the steps needed to be taken to reproduce the experiment, using provided tools as well as [data](experiment_results) produced in the experiment.
+* JavaScript 3D engine (with a hands on demo, see [demo](#demo)).
+* C++ 3D engine.
+* [Scripts](perf_automation.sh) automating the benchmarking process.
+* [Statystical tests](statistical_analysis.R) on collected data.
+* [Sample results](experiment_results)
+* [Step by step](README.md) replication process of the experiment.
+* [SnT report](bics_bsp_s2_2022_leonint_amarantos_overleaf_bsp_SnT_report.pdf) produced with the experiment, that details the design, production and motivation behind the project.
 
 ## C++ Engine environment setup(Linux)
 
@@ -119,11 +123,13 @@ chmod -x ./perf_automation.sh
 
 ## Parsing perf stat data
 
-The following python [script](perf_parser.py) organises the collected in the [experiment](#benchmarkingperf-stat) in a single .csv file, well suited for data analysis.
+The following python [script](perf_parser.py) organises the collected in the [experiment](#benchmarkingperf-stat) results in a single .csv file, well suited for data analysis.
 
 Set the following parameters if you make changes in the project design:
 * data_dir - directory with perf stat files
 * parsed_data_name - file name for the resulting .csv file
+
+If you would like to skip the data collection yourself samples collected in the original experiment are available in the experiment results [folder](experiment_results).
 
 ## Statistical analysis
 
@@ -134,3 +140,12 @@ The following R [script](statistical_analysis.R) contains the following steps:
 * lines 79-92 - Bar plot of the data.
 
 R script was run in the RStudio. A the script is modular you can chose to only run some of the described above points, only lines 1-7 are required.
+
+## Demo
+
+For a demonstration of the real use case of the engines follow [The JavaScript environment sutup](#javascript-engine-environment-setuplinux). Then launch the application with the following comand and flag:
+``` shell
+python3 server.py --scenario ShapeMuseum
+```
+
+Then use ```WASD``` keys and a mouse to navigate around the screen.
