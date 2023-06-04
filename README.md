@@ -1,4 +1,4 @@
-## JavaScript Engine environment setup(Linux)
+## JavaScript Engine environment setup (Linux)
 
 Install google-chrome-stable for the WebGL context:
 ```shell
@@ -6,7 +6,7 @@ wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
 sudo apt install ./google-chrome-stable_current_amd64.deb
 ```
 
-Change the instalation in **server.py** file if different from "/usr/bin/google-chrome-stable"
+Change the instalation path in **server.py** file if different from "/usr/bin/google-chrome-stable"
 ```
 ChromePath = "/path/to/your/google-chrome-stable"
 ```
