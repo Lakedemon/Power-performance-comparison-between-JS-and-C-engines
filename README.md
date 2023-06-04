@@ -2,7 +2,7 @@
 This repository is a part of a bachelor project completed in the University of luxembourg. 
 
 The project is focused on conducting energy and time benchmarks, comparing C++ and JavaScript in their performance in graphical applications. The project includes development of the test subjects, benchmarking environment and data analysis. The following are the components of this package:
-* JavaScript 3D engine (with a hands on demo, see [demo](#demo)).
+* [JavaScript 3D engine](JS_engine) (with a hands on demo, see [demo](#demo)).
 * [C++ 3D engine](CPP_engine).
 * [Scripts](perf_automation.sh) automating the benchmarking process.
 * [Statystical tests](statistical_analysis.R) on collected data.
