@@ -16,7 +16,7 @@ Get libraries and tools(cmake, g++ compiler, package manager and OpenGL dependec
 
 ```sh
 sudo apt-get update
-sudo apt-get install cmake pkg-config build-essential libglew-dev libglfw3-dev libglm-dev libao-dev libmpg123-dev libxinerama-dev libxcursor-dev libxi-dev
+sudo apt-get install cmake pkg-config build-essential libglew-dev libglfw3-dev libglm-dev libao-dev libmpg123-dev libxinerama-dev libxcursor-dev libxi-dev libjsoncpp-dev
 ```
 
 Get open source OpenGL implementation(GLFW) and configure the cmake:
@@ -42,14 +42,15 @@ Configuration for glad  is following:
 ```sh
 wget !!! Get the glad zip url from the provided url by clicking generate !!!
 unzip glad.zip
-cp -R include/* /usr/include/
+sudo cp -R include/* /usr/include/
 ```
 
-Test the setup with following:
+Test the setup with following, a window an orange triangle must appear:
 
 ```sh
 cd {your project dirrectory}
 g++ hello_triangle.cpp glad.c -ldl -lglfw
+./a.out
 ```
 
 Compile the repository:
@@ -105,13 +106,28 @@ perf stat -a -o <your output file name> -e /power/energy-pkg/,/power/energy-ram/
 perf stat -a -o <your output file name> -e /power/energy-pkg/,/power/energy-ram/ <JS engine build path> python3 server.py --scenario <your selected scenario>
 ```
 
-The C++ engine must be first built with cmake, in order to produce an executable file, for how refer to [C++ Engine setup](#c-engine-environment-setuplinux)
+Before running the automation script compile C++ targets, for how refer to [C++ Engine setup](#c-engine-environment-setuplinux)
+Compile 3 target folders:
+```
+Scenario1_build
+Scenario2_build
+Scenario3_build
+```
+
+Each time change the ```defaultGLTF``` variable in the [config file](/CPP_engine/config/config.h) to the forllowing respectively:
+```
+Scenario1.gltf
+Scenario2.gltf
+Scenario3.gltf
+```
+
 The JS engine does not need to be build in order to be run and supports flags "--scenaro" that allow the user to select the scene/scenario that is launched from the assets folder
 
-The described process is automated with the following [script](perf_automation.sh).
-When using make sure to edit if needed for the experiment:
+Now that all of the targets are ready, adjust and run the following [script](perf_automation.sh).
+The following is the description of variables that can be adjusted:
 * n - number of repetitions that script runs for each of the scenario.
 * duration_between runs - time that a machine will sleep(to cool down) for in seconds.
+* target_directories - a list of the directories to run the targets in.
 * targets - a list of targets perf stat is run on
 * new_dir_names - names of the dirrectories test result is stored in, required for data analysis part, the format is following "[JS/CPP]_[low/mid/high]"
 
@@ -119,6 +135,10 @@ Make the script executable and run it with following:
 ```shell
 chmod -x ./perf_automation.sh
 ./perf_automation.sh
+```
+or 
+```shell
+bash perf_automation.sh
 ```
 
 ## Parsing perf stat data
@@ -130,6 +150,11 @@ Set the following parameters if you make changes in the project design:
 * parsed_data_name - file name for the resulting .csv file
 
 If you would like to skip the data collection yourself samples collected in the original experiment are available in the experiment results [folder](experiment_results).
+
+Otherwise run:
+```shell
+python3 perf_parser.py
+```
 
 ## Statistical analysis
 

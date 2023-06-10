@@ -1,19 +1,20 @@
 import os
 import csv
 import re
+import locale
 
-data_dir = "C:/Users/leoni/Documents/University/Semester2/BSP2/Statistics/target_all2"
+data_dir = os.getcwd() + "/data_dir"
 parsed_data_name = "parsed_data.csv"
 labels = ["Engine", "Scenario", "Time", "Energy"]
-numericSearch = "\d+\.\d+"
+numericSearch = "(\d+[\.\,]*)+"
+locale.setlocale(locale.LC_ALL, '')
 
 def getNumFromLine(line):
-    line = line.replace(",", "")
     num = re.search(numericSearch, line)[0]
 
     if num is None:
         return 0
-    return float(num)
+    return locale.atof(num)
 
 def main():
     with open(parsed_data_name, "w") as d:
@@ -25,6 +26,7 @@ def main():
             for file in os.listdir(data_dir + "/" + target_dir):
                 with open(data_dir + "/" + target_dir + "/" + file, "r") as f:
                     lines = f.readlines()
+
                     time = getNumFromLine(lines[8])
                     energy = getNumFromLine(lines[5]) + getNumFromLine(lines[6])
 

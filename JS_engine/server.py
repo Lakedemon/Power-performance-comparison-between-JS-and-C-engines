@@ -8,7 +8,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--scenario', type=str, help="string name of gltf scene to be launched")
 args = parser.parse_args()
 
-RequestScene = args.scenario
+RequestScene = args.scenario or "Scenario1"
 
 ChromePath = "/usr/bin/google-chrome-stable"
 ChromeFlags = "--disable-gpu-vsync --disable-frame-rate-limit --window-size=1920,1080"
